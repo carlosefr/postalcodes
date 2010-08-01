@@ -24,6 +24,7 @@
 
 
 import hypermedia.net.*;
+import java.io.*;
 
 
 /* The three portuguese regions... */
@@ -46,7 +47,7 @@ int[][] bounds;
 Map<String,PostalCode> codes;
 List<PlaceMarker> markers;
 
-PImage artwork;
+PImage bgimage;
 UDP server;
 
 
@@ -54,24 +55,32 @@ void setup() {
   size(1152, 768, JAVA2D);
   frameRate(30);
   smooth();
- 
-  bounds = regionBounds(50);
-  artwork = loadImage("background.png");
   
+  bounds = regionBounds(50);
+
   codes = Collections.unmodifiableMap(loadPostalCodes("postalcodes.txt", bounds));
   markers = Collections.synchronizedList(new LinkedList<PlaceMarker>());
 
   server = new UDP(this, 15001);
   server.listen(true);
-  
-  /* Generate an image to serve as the background template... */
-  // writeTemplate("template.png", codes, bounds);
+   
+  String bgname = String.format("background-%dx%d.png", width, height);
+
+  /*
+   * If a suitable background image does not exist, we generate one with the three
+   * region's boundaries clearly marked so that it can later be used as a template...
+   */
+  if (!(new File(dataPath(bgname))).exists()) {
+    writeTemplate(dataPath(bgname), codes, bounds);
+  }
+
+  bgimage = loadImage(bgname);
 }
 
 
 void draw() {
   /* Draw the background image first, to clear everything... */
-  image(artwork, 0, 0);
+  image(bgimage, 0, 0);
 
   /* Update the animation for each active marker... */
   synchronized (markers) {
