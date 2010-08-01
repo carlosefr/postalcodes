@@ -27,7 +27,7 @@
 
 from __future__ import division;
 
-import os
+import os, os.path
 import sys
 import socket
 import time
@@ -37,12 +37,12 @@ from getopt import getopt, GetoptError
 
 
 def print_usage():
-    sys.stdout.write("USAGE: %s -h <hostname> -p <port> -f <postalcodes.txt>\n" % os.path.basename(sys.argv[0]))
+    sys.stdout.write("USAGE: %s -h <hostname> -p <port> -r <rate> -f <postalcodes.txt>\n" % os.path.basename(sys.argv[0]))
 
 
 def parse_args():
     try:
-        options, args = getopt(sys.argv[1:], "h:p:f:", ["hostname=", "port=", "file="])
+        options, args = getopt(sys.argv[1:], "h:p:r:f:", ["hostname=", "port=", "rate=", "file="])
     except GetoptError, e:
         sys.stderr.write("error: %s\n" % e)
         print_usage()
@@ -50,6 +50,7 @@ def parse_args():
 
     hostname = "127.0.0.1" 
     port = 15001
+    rate = 4  # ...per second
     ifile = None
         
     for option, value in options:
@@ -57,29 +58,21 @@ def parse_args():
             hostname = value
         elif option in ("-p", "--port"):
             port = int(value)
+        elif option in ("-r", "--rate"):
+            rate = float(value)
         elif option in ("-f", "--file"):
             ifile = value
     
-    if hostname == None:
-        sys.stderr.write("error: parameter(s) missing\n")
-        print_usage()
-        sys.exit(1)
-
-    if port == None:
-        sys.stderr.write("error: parameter(s) missing\n")
-        print_usage()
-        sys.exit(1)
-
     if ifile == None:
         sys.stderr.write("error: parameter(s) missing\n")
         print_usage()
         sys.exit(1)
 
-    return (hostname, port, ifile)
+    return (hostname, port, rate, ifile)
 
 
 if __name__ == "__main__":
-    (hostname, port, ifile) = parse_args()
+    (hostname, port, rate, ifile) = parse_args()
 
     f = open(ifile, "r")
 
@@ -92,10 +85,17 @@ if __name__ == "__main__":
     f.close()
 
     udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    address = (socket.gethostbyname(hostname), port)
 
     while 1:
-        udp.sendto(random.choice(codes), (hostname, port))
-        time.sleep(0.15)
+        # In a real client we don't want it to terminate if the graphical application
+        # can't be reached. We want it to keep running and recover automatically.
+        try:
+            udp.sendto(random.choice(codes), address)
+        except socket.error:
+            pass
+
+        time.sleep(1/rate)
 
 
 # vim: set expandtab ts=4 sw=4:
