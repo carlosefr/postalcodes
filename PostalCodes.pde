@@ -176,18 +176,19 @@ void receive(byte[] data) {
   
   PostalCode code = codes.get(message);
   
-  if (code == null) {
-    /* Try the simplified code... */
+  if (code == null) {  /* Try the simplified code... */
     code = codes.get(split(message, "-")[0] + "-000");
 
     if (code == null) {
-      println("Code not found: " + message);
+      println("Not found: " + message);
       return;
     }
 
-    println("Code found (simple): " + message);
+    println("Found (simple): " + code);
+  } else {
+    println("Found: " + code);
   }
-
+  
   markers.add(new PlaceMarker(code.x, code.y));
 }
 

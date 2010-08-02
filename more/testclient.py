@@ -37,7 +37,7 @@ from getopt import getopt, GetoptError
 
 
 def print_usage():
-    sys.stdout.write("USAGE: %s -h <hostname> -p <port> -r <rate> -f <postalcodes.txt>\n" % os.path.basename(sys.argv[0]))
+    sys.stdout.write("USAGE: %s [-h <hostname>] [-p <port>] [-r <rate>] -f <postalcodes.txt>\n" % os.path.basename(sys.argv[0]))
 
 
 def parse_args():
