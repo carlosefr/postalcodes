@@ -55,6 +55,11 @@ void setup() {
   frameRate(30);
   smooth();
   
+  /* Hide the cursor when in "present/fullscreen" mode... */
+  if (frame.isUndecorated()) {
+    noCursor();
+  }
+  
   bounds = regionBounds(50);
 
   codes = Collections.unmodifiableMap(loadPostalCodes("postalcodes.txt", bounds));
@@ -69,12 +74,12 @@ void setup() {
    * If a suitable background image does not exist, we have to generate one with
    * the three region's boundaries clearly marked to be used as a template...
    */
-  // writeTemplate(dataPath(String.format("background-%dx%d.png", width, height)), codes, bounds);
+  // writeTemplate(dataPath(String.format("template-%dx%d.png", width, height)), codes, bounds);
 }
 
 
 void draw() {
-  /* Draw the background image first, to clear everything... */
+  /* On the Mac this is *much* faster than using background()... */
   image(artwork, 0, 0);
 
   /* Update the animation for each active marker... */
