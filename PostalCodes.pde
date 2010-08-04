@@ -41,6 +41,8 @@ final color BEAT_COLOR_1 = #d72f28;
 final color BEAT_COLOR_2 = #379566;
 final short BEAT_RADIUS = 8;
 
+/* The text showing the last event... */
+final color EVENT_COLOR = #000000;
 
 int[][] bounds;
 Map<String,PostalCode> codes;
@@ -49,6 +51,8 @@ List<PlaceMarker> markers;
 PImage artwork;
 UDP server;
 PrintWriter logfile;
+PFont font;
+String lastEvent = "";
 
 
 void setup() {
@@ -72,6 +76,8 @@ void setup() {
   server.listen(true);
   
   artwork = loadImage(String.format("background-%dx%d.png", width, height));
+
+  font = loadFont("Verdana-Bold-18.vlw");
 
   /*
    * If a suitable background image does not exist, we have to generate one with
@@ -102,9 +108,16 @@ void draw() {
     }
   }
   
+  /* The last event (time and place of the most recent marker)... */
+  textFont(font);
+  textAlign(RIGHT);
+  
+  fill(EVENT_COLOR);
+  text(lastEvent, width - 60, height - 22);
+  
   /* Two rotating circles ("heartbeat")... */
   noStroke();
-
+  
   translate(width - 30, height - 30);
   rotate(radians(millis() / 3));
 
@@ -207,6 +220,9 @@ void receive(byte[] data, String ip, int port) {
   }
   
   markers.add(new PlaceMarker(code.x, code.y));
+  
+  /* Update the place of the most recent marker... */
+  lastEvent = String.format("%d:%02d - %s", hour(), minute(), code.place);
 }
 
 

@@ -24,7 +24,7 @@
 
 
 /* In milliseconds... */
-final int DURATION = 2500;
+final int DURATION = 3000;
 final int FADE = 500;
 
 final int MAX_RADIUS = 30;
@@ -46,8 +46,8 @@ public class PlaceMarker {
   
   public void draw() {
     int elapsed = millis() - start;
-    int radius = round(map(sqrt(2*elapsed*DURATION - sq(elapsed)), 0, DURATION, 0, MAX_RADIUS));
     int opacity = elapsed <= DURATION - FADE ? 255 : round(map(DURATION - elapsed, FADE, 0, 255, 0));
+    float radius = map(sqrt(2*elapsed*DURATION - sq(elapsed)), 0, DURATION, 0, MAX_RADIUS);
     
     pushStyle();
     
@@ -57,7 +57,7 @@ public class PlaceMarker {
     ellipse(this.x, this.y, radius, radius);
     
     stroke(OUTER_COLOR, opacity);
-    strokeWeight(round(radius/3));
+    strokeWeight(radius/3);
     noFill();
     
     ellipse(this.x, this.y, radius*2, radius*2);
