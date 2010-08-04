@@ -24,13 +24,14 @@
 
 
 /* In milliseconds... */
-final int DURATION = 3000;
-final int MAX_RADIUS = 25;
+final int DURATION = 2500;
+final int FADE = 500;
+
+final int MAX_RADIUS = 30;
 
 /* Marker colors... */
 final color INNER_COLOR = #d72f28;
 final color OUTER_COLOR = #379566;
-
 
 public class PlaceMarker {
   private int start;
@@ -45,8 +46,8 @@ public class PlaceMarker {
   
   public void draw() {
     int elapsed = millis() - start;
-    int radius = round(map(1.0/DURATION * sq(elapsed), 0, DURATION, 0, MAX_RADIUS));
-    int opacity = elapsed >= DURATION - 255 ? DURATION - elapsed : 255;
+    int radius = round(map(sqrt(2*elapsed*DURATION - sq(elapsed)), 0, DURATION, 0, MAX_RADIUS));
+    int opacity = elapsed <= DURATION - FADE ? 255 : round(map(DURATION - elapsed, FADE, 0, 255, 0));
     
     pushStyle();
     
