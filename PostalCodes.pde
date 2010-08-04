@@ -48,6 +48,7 @@ List<PlaceMarker> markers;
 
 PImage artwork;
 UDP server;
+PrintWriter logfile;
 
 
 void setup() {
@@ -64,6 +65,8 @@ void setup() {
 
   codes = Collections.unmodifiableMap(loadPostalCodes("postalcodes.txt", bounds));
   markers = Collections.synchronizedList(new LinkedList<PlaceMarker>());
+
+  logfile = createWriter("postalcodes.log");
 
   server = new UDP(this, 15001);
   server.listen(true);
@@ -172,10 +175,14 @@ Map<String,PostalCode> loadPostalCodes(String filename, int[][] bounds) {
 }
 
 
-void receive(byte[] data) {
+void receive(byte[] data, String ip, int port) {
   String message = new String(data);
+  String ts = String.format("%d-%02d-%02d %02d:%02d:%02d [%s:%d]", year(), month(), day(), hour(), minute(), second(), ip, port);
   
   if (!message.matches("^\\d{4}-\\d{3}$")) {
+    logfile.println(ts + ": invalid data");
+    logfile.flush();
+    
     return;
   }
   
@@ -185,13 +192,18 @@ void receive(byte[] data) {
     code = codes.get(split(message, "-")[0] + "-000");
 
     if (code == null) {
-      println("Not found: " + message);
+      logfile.println(ts + ": not found: " + message);
+      logfile.flush();
+      
       return;
     }
 
-    println("Found (simple): " + code);
+    logfile.println(ts + ": found (simple): " + code);
+    logfile.flush();
+
   } else {
-    println("Found: " + code);
+    logfile.println(ts + ": found: " + code);
+    logfile.flush();
   }
   
   markers.add(new PlaceMarker(code.x, code.y));
