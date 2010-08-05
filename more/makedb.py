@@ -155,7 +155,7 @@ def process(ifile, ofile):
 
     f = open(ofile, "w")
 
-    for line in output:
+    for line in sorted(output):
         f.write(line + "\n")
 
     f.close()
