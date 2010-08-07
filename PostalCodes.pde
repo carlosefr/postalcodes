@@ -56,7 +56,7 @@ String lastEvent = "";
 
 
 void setup() {
-  size(1152, 768, JAVA2D);
+  size(1280, 768, JAVA2D);
   frameRate(30);
   smooth();
   
