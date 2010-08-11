@@ -108,7 +108,7 @@ void draw() {
   textFont(font);
   textAlign(RIGHT);
   fill(EVENT_COLOR);
-  text(String.format("%s / %d na última hora", lastEvent, events.size()), width - 60, height - 22);
+  text(String.format("%s / %d na Ãºltima hora", lastEvent, events.size()), width - 60, height - 22);
 
   /* Update the animation for each active marker... */
   synchronized (markers) {
