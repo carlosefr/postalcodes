@@ -52,7 +52,9 @@ PImage artwork;
 UDP server;
 PrintWriter logfile;
 PFont font;
+
 String lastEvent = "";
+List<Integer> events;
 
 
 void setup() {
@@ -69,6 +71,7 @@ void setup() {
 
   codes = Collections.unmodifiableMap(loadPostalCodes("postalcodes.txt", bounds));
   markers = Collections.synchronizedList(new LinkedList<PlaceMarker>());
+  events = Collections.synchronizedList(new LinkedList<Integer>());
 
   logfile = createWriter("postalcodes.log");
 
@@ -91,6 +94,22 @@ void draw() {
   /* On the Mac this is *much* faster than using background()... */
   image(artwork, 0, 0);
 
+  /* Remove events older than one hour... */
+  synchronized (events) {
+    Iterator<Integer> iterator = events.iterator();
+    int oldest = millis() - 3600000;
+
+    while (iterator.hasNext() && iterator.next() <= oldest) {
+      iterator.remove();
+    }
+  }
+  
+  /* The last event and the number of events for the last hour... */  
+  textFont(font);
+  textAlign(RIGHT);
+  fill(EVENT_COLOR);
+  text(String.format("%s / %d na última hora", lastEvent, events.size()), width - 60, height - 22);
+
   /* Update the animation for each active marker... */
   synchronized (markers) {
     Iterator<PlaceMarker> iterator = markers.iterator();
@@ -108,16 +127,8 @@ void draw() {
     }
   }
   
-  /* The last event (time and place of the most recent marker)... */
-  textFont(font);
-  textAlign(RIGHT);
-  
-  fill(EVENT_COLOR);
-  text(lastEvent, width - 60, height - 22);
-  
   /* Two rotating circles ("heartbeat")... */
   noStroke();
-  
   translate(width - 30, height - 30);
   rotate(radians(millis() / 3));
 
@@ -190,7 +201,11 @@ Map<String,PostalCode> loadPostalCodes(String filename, int[][] bounds) {
 
 void receive(byte[] data, String ip, int port) {
   String message = new String(data);
-  String ts = String.format("%d-%02d-%02d %02d:%02d:%02d [%s:%d]", year(), month(), day(), hour(), minute(), second(), ip, port);
+  
+  int h = hour();
+  int m = minute();
+  
+  String ts = String.format("%d-%02d-%02d %02d:%02d:%02d [%s:%d]", year(), month(), day(), h, m, second(), ip, port);
   
   if (!message.matches("^\\d{4}-\\d{3}$")) {
     logfile.println(ts + ": invalid data");
@@ -220,9 +235,12 @@ void receive(byte[] data, String ip, int port) {
   }
   
   markers.add(new PlaceMarker(code.x, code.y));
-  
+    
   /* Update the place of the most recent marker... */
-  lastEvent = String.format("%d:%02d - %s", hour(), minute(), code.place);
+  lastEvent = String.format("%d:%02d - %s", h, m, code.place);
+
+  /* Record the time of the event... */
+  events.add(millis());
 }
 
 
