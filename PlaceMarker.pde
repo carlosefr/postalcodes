@@ -69,7 +69,7 @@ public class PlaceMarker {
     } else {
       /* Then stay for the remaining time as a simple marker... */
       noStroke();
-      fill(INNER_COLOR);
+      fill(INNER_COLOR, 128);
       
       ellipse(this.x, this.y, MAX_RADIUS/4, MAX_RADIUS/4);
     }
