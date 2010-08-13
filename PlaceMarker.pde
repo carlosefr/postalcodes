@@ -1,5 +1,5 @@
 /*
- * Marker.pde - animated makers.
+ * Marker.pde - animated markers.
  *
  * Copyright (c) 2010 Carlos Rodrigues <cefrodrigues@gmail.com>
  *
@@ -34,6 +34,7 @@ final int REMAIN = 3600000;  // Don't forget to change the text in "PostalCodes.
 /* Marker colors... */
 final color INNER_COLOR = #d72f28;
 final color OUTER_COLOR = #379566;
+
 
 public class PlaceMarker {
   private int start;
