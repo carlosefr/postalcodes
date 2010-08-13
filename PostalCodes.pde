@@ -247,6 +247,8 @@ void receive(byte[] data, String ip, int port) {
 void writeTemplate(String filename, Map<String,PostalCode> codes, int[][] bounds) {
   PGraphics pg = createGraphics(width, height, JAVA2D);
   
+  pg.beginDraw();
+  pg.smooth();
   pg.background(#ffffff);
   
   pg.noFill();
@@ -258,13 +260,15 @@ void writeTemplate(String filename, Map<String,PostalCode> codes, int[][] bounds
 
   Iterator<PostalCode> iterator = codes.values().iterator();
 
-  pg.loadPixels();
+  pg.fill(#000000, 64);
+  pg.noStroke();
+
   while (iterator.hasNext()) {
     PostalCode code = iterator.next();
-    pg.pixels[code.y * width + code.x] = #000000;
+    pg.ellipse(code.x, code.y, 2, 2);
   }
-  pg.updatePixels();
-  
+
+  pg.endDraw();  
   pg.save(filename);
 }
 
