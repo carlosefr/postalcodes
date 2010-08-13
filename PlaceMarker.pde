@@ -23,11 +23,13 @@
  */
 
 
-/* In milliseconds... */
+/* Initial animation (times in milliseconds)... */
 final int DURATION = 3000;
 final int FADE = 500;
-
 final int MAX_RADIUS = 30;
+
+/* Time on screen (milliseconds)... */
+final int REMAIN = 3600000;  // Don't forget to change the text in "PostalCodes.draw()"...
 
 /* Marker colors... */
 final color INNER_COLOR = #d72f28;
@@ -43,30 +45,40 @@ public class PlaceMarker {
     this.x = x;
     this.y = y;
   }
-  
+
   public void draw() {
     int elapsed = millis() - start;
-    int opacity = elapsed <= DURATION - FADE ? 255 : round(map(DURATION - elapsed, FADE, 0, 255, 0));
-    float radius = map(sqrt(2*elapsed*DURATION - sq(elapsed)), 0, DURATION, 0, MAX_RADIUS);
-    
+
     pushStyle();
     
-    noStroke();
-    fill(INNER_COLOR, opacity);
+    if (elapsed < DURATION) {
+      /* Start with an animated "explosion"... */
+      int opacity = elapsed <= DURATION - FADE ? 255 : round(map(DURATION - elapsed, FADE, 0, 255, 0));
+      float radius = map(sqrt(2*elapsed*DURATION - sq(elapsed)), 0, DURATION, 0, MAX_RADIUS);
+      
+      noStroke();
+      fill(INNER_COLOR, opacity);
     
-    ellipse(this.x, this.y, radius, radius);
+      ellipse(this.x, this.y, radius, radius);
     
-    stroke(OUTER_COLOR, opacity);
-    strokeWeight(radius/3);
-    noFill();
+      stroke(OUTER_COLOR, opacity);
+      strokeWeight(radius/3);
+      noFill();
     
-    ellipse(this.x, this.y, radius*2, radius*2);
+      ellipse(this.x, this.y, radius*2, radius*2);
+    } else {
+      /* Then stay for the remaining time as a simple marker... */
+      noStroke();
+      fill(INNER_COLOR);
+      
+      ellipse(this.x, this.y, MAX_RADIUS/4, MAX_RADIUS/4);
+    }
     
     popStyle();
   }
   
   public boolean finished() {
-    return millis() - start > DURATION;
+    return millis() - start > REMAIN;
   }
 }
 

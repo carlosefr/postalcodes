@@ -54,7 +54,6 @@ PrintWriter logfile;
 PFont font;
 
 String lastEvent = "";
-List<Integer> events;
 
 
 void setup() {
@@ -71,7 +70,6 @@ void setup() {
 
   codes = Collections.unmodifiableMap(loadPostalCodes("postalcodes.txt", bounds));
   markers = Collections.synchronizedList(new LinkedList<PlaceMarker>());
-  events = Collections.synchronizedList(new LinkedList<Integer>());
 
   logfile = createWriter("postalcodes.log");
 
@@ -94,22 +92,6 @@ void draw() {
   /* On the Mac this is *much* faster than using background()... */
   image(artwork, 0, 0);
 
-  /* Remove events older than one hour... */
-  synchronized (events) {
-    Iterator<Integer> iterator = events.iterator();
-    int oldest = millis() - 3600000;
-
-    while (iterator.hasNext() && iterator.next() <= oldest) {
-      iterator.remove();
-    }
-  }
-  
-  /* The last event and the number of events for the last hour... */  
-  textFont(font);
-  textAlign(RIGHT);
-  fill(EVENT_COLOR);
-  text(String.format("%s / %d na última hora", lastEvent, events.size()), width - 60, height - 22);
-
   /* Update the animation for each active marker... */
   synchronized (markers) {
     Iterator<PlaceMarker> iterator = markers.iterator();
@@ -117,7 +99,6 @@ void draw() {
     while (iterator.hasNext()) {
       PlaceMarker marker = iterator.next();
 
-      /* Animation finished... */
       if (marker.finished()) {
         iterator.remove();
         continue;
@@ -126,6 +107,12 @@ void draw() {
       marker.draw();
     }
   }
+
+  /* The last event and the number of events on screen... */
+  textFont(font);
+  textAlign(RIGHT);
+  fill(EVENT_COLOR);
+  text(String.format("%s / %d na última hora", lastEvent, markers.size()), width - 60, height - 22);
   
   /* Two rotating circles ("heartbeat")... */
   noStroke();
@@ -238,9 +225,6 @@ void receive(byte[] data, String ip, int port) {
     
   /* Update the place of the most recent marker... */
   lastEvent = String.format("%d:%02d - %s", h, m, code.place);
-
-  /* Record the time of the event... */
-  events.add(millis());
 }
 
 
