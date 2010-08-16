@@ -29,7 +29,7 @@ final int FADE = 500;
 final int MAX_RADIUS = 30;
 
 /* Time on screen (milliseconds)... */
-final int REMAIN = 3600000;  // Don't forget to change the text in "PostalCodes.draw()"...
+final int REMAIN = 3600000;
 
 /* Marker colors... */
 final color INNER_COLOR = #d72f28;
@@ -71,8 +71,14 @@ public class PlaceMarker {
       /* Then stay for the remaining time as a simple marker... */
       noStroke();
       fill(INNER_COLOR, 128);
-      
+
       ellipse(this.x, this.y, MAX_RADIUS/4, MAX_RADIUS/4);
+      
+      stroke(OUTER_COLOR, 128);
+      strokeWeight(MAX_RADIUS/8);
+      noFill();
+      
+      ellipse(this.x, this.y, MAX_RADIUS/2, MAX_RADIUS/2);
     }
     
     popStyle();
