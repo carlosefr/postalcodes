@@ -44,6 +44,9 @@ final short BEAT_RADIUS = 8;
 /* The text showing the last event... */
 final color EVENT_COLOR = #000000;
 
+/* The text showing the event counter... */
+final color COUNT_COLOR = #000000;
+
 int[][] bounds;
 Map<String,PostalCode> codes;
 List<PlaceMarker> markers;
@@ -51,7 +54,9 @@ List<PlaceMarker> markers;
 PImage artwork;
 UDP server;
 PrintWriter logfile;
-PFont font;
+
+PFont eventFont;
+PFont countFont;
 
 String lastEvent = "";
 
@@ -78,7 +83,8 @@ void setup() {
   
   artwork = loadImage(String.format("background-%dx%d.png", width, height));
 
-  font = loadFont("Verdana-Bold-18.vlw");
+  eventFont = loadFont("Verdana-Bold-18.vlw");
+  countFont = loadFont("Arial-Black-144.vlw");
 
   /*
    * If a suitable background image does not exist, we have to generate one with
@@ -92,29 +98,31 @@ void draw() {
   /* On the Mac this is *much* faster than using background()... */
   image(artwork, 0, 0);
 
-  /* Update the animation for each active marker... */
+  /* Remove the expired markers... */
   synchronized (markers) {
     Iterator<PlaceMarker> iterator = markers.iterator();
   
     while (iterator.hasNext()) {
-      PlaceMarker marker = iterator.next();
-
-      if (marker.finished()) {
+      if (iterator.next().finished()) {
         iterator.remove();
-        continue;
       }
-
-      marker.draw();
     }
   }
 
-  /* The last event and the number of events on screen... */
-  textFont(font);
+  /* The counter of events currently displayed (last hour)... */  
+  textFont(countFont);
+  textAlign(LEFT);
+  fill(COUNT_COLOR);
+  text(markers.size(), 50, height/2 + textAscent()/2);
+  
+  /* The last event... */
+  textFont(eventFont);
   textAlign(RIGHT);
   fill(EVENT_COLOR);
-  text(String.format("%s / %d na última hora", lastEvent, markers.size()), width - 60, height - 22);
-  
+  text(lastEvent, width - 60, height - 30 + textAscent()/2);
+
   /* Two rotating circles ("heartbeat")... */
+  pushMatrix();
   noStroke();
   translate(width - 30, height - 30);
   rotate(radians(millis() / 3));
@@ -124,6 +132,16 @@ void draw() {
 
   fill(BEAT_COLOR_2);
   ellipse(BEAT_RADIUS/2, BEAT_RADIUS/2, BEAT_RADIUS, BEAT_RADIUS);
+  popMatrix();
+
+  /* Update the markers (do this last to always be on top)... */
+  synchronized (markers) {
+    Iterator<PlaceMarker> iterator = markers.iterator();
+  
+    while (iterator.hasNext()) {
+      iterator.next().draw();
+    }
+  }
 }
 
 
