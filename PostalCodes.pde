@@ -101,11 +101,10 @@ void draw() {
   /* Remove the expired markers... */
   synchronized (markers) {
     Iterator<PlaceMarker> iterator = markers.iterator();
-  
-    while (iterator.hasNext()) {
-      if (iterator.next().finished()) {
-        iterator.remove();
-      }
+    
+    /* Since the markers are ordered, we can stop on the first one which isn't finished... */
+    while (iterator.hasNext() && iterator.next().finished()) {
+      iterator.remove();
     }
   }
 
@@ -120,7 +119,7 @@ void draw() {
   textAlign(RIGHT);
   fill(EVENT_COLOR);
   text(lastEvent, width - 60, height - 30 + textAscent()/2);
-
+  
   /* Two rotating circles ("heartbeat")... */
   pushMatrix();
   noStroke();

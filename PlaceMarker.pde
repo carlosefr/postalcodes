@@ -48,44 +48,54 @@ public class PlaceMarker {
   }
 
   public void draw() {
-    int elapsed = millis() - start;
-
-    pushStyle();
-    
-    if (elapsed < DURATION) {
-      /* Start with an animated "explosion"... */
-      int opacity = elapsed <= DURATION - FADE ? 255 : round(map(DURATION - elapsed, FADE, 0, 255, 0));
-      float radius = map(sqrt(2*elapsed*DURATION - sq(elapsed)), 0, DURATION, 0, MAX_RADIUS);
-      
-      noStroke();
-      fill(INNER_COLOR, opacity);
-    
-      ellipse(this.x, this.y, radius, radius);
-    
-      stroke(OUTER_COLOR, opacity);
-      strokeWeight(radius/3);
-      noFill();
-    
-      ellipse(this.x, this.y, radius*2, radius*2);
+    if (millis() < this.start + DURATION) {
+      this.animate();  // Begin with an animated "explosion"...
     } else {
-      /* Then stay for the remaining time as a simple marker... */
-      noStroke();
-      fill(INNER_COLOR, 128);
-
-      ellipse(this.x, this.y, MAX_RADIUS/4, MAX_RADIUS/4);
-      
-      stroke(OUTER_COLOR, 128);
-      strokeWeight(MAX_RADIUS/8);
-      noFill();
-      
-      ellipse(this.x, this.y, MAX_RADIUS/2, MAX_RADIUS/2);
+      this.stay();     // Then stay as a simple marker...
     }
-    
-    popStyle();
   }
   
   public boolean finished() {
-    return millis() - start > REMAIN;
+    return millis() - this.start > REMAIN;
+  }
+  
+  private void animate() {
+    pushStyle();
+
+    int elapsed = millis() - this.start;
+        
+    float opacity = elapsed <= DURATION - FADE ? 255 : map(DURATION - elapsed, FADE, 0, 255, 0);
+    float radius = map(sqrt(2*elapsed*DURATION - sq(elapsed)), 0, DURATION, 0, MAX_RADIUS);
+    
+    noStroke();
+    fill(INNER_COLOR, opacity);
+    
+    ellipse(this.x, this.y, radius, radius);
+    
+    stroke(OUTER_COLOR, opacity);
+    strokeWeight(radius/3.0);
+    noFill();
+    
+    ellipse(this.x, this.y, radius*2, radius*2);
+
+    popStyle();
+  }
+  
+  private void stay() {
+    pushStyle();
+
+    noStroke();
+    fill(INNER_COLOR, 128);
+    
+    ellipse(this.x, this.y, MAX_RADIUS/4.0, MAX_RADIUS/4.0);
+    
+    stroke(OUTER_COLOR, 128);
+    strokeWeight(MAX_RADIUS/8.0);
+    noFill();
+    
+    ellipse(this.x, this.y, MAX_RADIUS/2.0, MAX_RADIUS/2.0);
+
+    popStyle();
   }
 }
 
