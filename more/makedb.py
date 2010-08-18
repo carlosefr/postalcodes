@@ -119,7 +119,7 @@ def process(ifile, ofile):
     # To prune duplicate lines...
     output = set()
 
-    for line in f:
+    for line in sorted(f):
         line.rstrip("\n")
         fields = line.split("\t")
 
