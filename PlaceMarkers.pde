@@ -23,11 +23,17 @@
  */
 
 
+/* Maximum number of static markers at each location... */
+final int MAX_MARKERS = 5;
+
+
 public class PlaceMarkers {
   private List<PlaceMarker> markers;
+  private int[][] counters;  // ...number of static markers at each location.
   
   public PlaceMarkers() {
     this.markers = new LinkedList<PlaceMarker>();
+    this.counters = new int[width][height];
   }
 
   public synchronized int count() {
@@ -54,11 +60,28 @@ public class PlaceMarkers {
   }
   
   public synchronized void draw() {
+    /* (Re)initialize the static marker counters... */
+    for (int i = 0; i < this.counters.length; i++) {
+      Arrays.fill(this.counters[i], 0);
+    }
+    
     Iterator<PlaceMarker> iterator = markers.iterator();
 
     while (iterator.hasNext()) {
       PlaceMarker marker = iterator.next();
+      
+      if (!marker.exploding()) {
+        this.counters[marker.x][marker.y]++;
 
+        /*
+         * If there are already too many static markers at this
+         * location, skip this one and save some CPU cycles...
+         */
+        if (this.counters[marker.x][marker.y] > MAX_MARKERS) {
+          continue;
+        }
+      }
+      
       marker.draw();
     }
   }
