@@ -1,5 +1,5 @@
 /*
- * Marker.pde - animated markers.
+ * PlaceMarker.pde - animated markers.
  *
  * Copyright (c) 2010 Carlos Rodrigues <cefrodrigues@gmail.com>
  *
@@ -38,8 +38,9 @@ final color OUTER_COLOR = #379566;
 
 public class PlaceMarker {
   private int start;
-  private int x;
-  private int y;
+  
+  public int x;
+  public int y;
   
   public PlaceMarker(int x, int y) {
     this.start = millis();
@@ -48,18 +49,22 @@ public class PlaceMarker {
   }
 
   public void draw() {
-    if (millis() < this.start + DURATION) {
-      this.animate();  // Begin with an animated "explosion"...
+    if (this.exploding()) {
+      this.explode();  // Begin with an animated "explosion"...
     } else {
       this.stay();     // Then stay as a simple marker...
     }
+  }
+
+  public boolean exploding() {
+    return millis() < this.start + DURATION;
   }
   
   public boolean finished() {
     return millis() - this.start > REMAIN;
   }
   
-  private void animate() {
+  private void explode() {
     pushStyle();
 
     int elapsed = millis() - this.start;
@@ -100,4 +105,4 @@ public class PlaceMarker {
 }
 
 
-/* EOF - Marker.pde */
+/* EOF - PlaceMarker.pde */

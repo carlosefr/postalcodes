@@ -49,7 +49,7 @@ final color COUNT_COLOR = #000000;
 
 int[][] bounds;
 Map<String,PostalCode> codes;
-List<PlaceMarker> markers;
+PlaceMarkers markers;
 
 PImage artwork;
 UDP server;
@@ -74,17 +74,18 @@ void setup() {
   bounds = regionBounds(50);
 
   codes = Collections.unmodifiableMap(loadPostalCodes("postalcodes.txt", bounds));
-  markers = Collections.synchronizedList(new LinkedList<PlaceMarker>());
 
   logfile = createWriter("postalcodes.log");
-
-  server = new UDP(this, 15001);
-  server.listen(true);
   
   artwork = loadImage(String.format("background-%dx%d.png", width, height));
 
   eventFont = loadFont("Verdana-Bold-18.vlw");
   countFont = loadFont("Arial-Black-144.vlw");
+
+  markers = new PlaceMarkers();
+
+  server = new UDP(this, 15001);
+  server.listen(true);
 
   /*
    * If a suitable background image does not exist, we have to generate one with
@@ -99,20 +100,13 @@ void draw() {
   image(artwork, 0, 0);
 
   /* Remove the expired markers... */
-  synchronized (markers) {
-    Iterator<PlaceMarker> iterator = markers.iterator();
-    
-    /* Since the markers are ordered, we can stop on the first one which isn't finished... */
-    while (iterator.hasNext() && iterator.next().finished()) {
-      iterator.remove();
-    }
-  }
+  markers.clean();
 
   /* The counter of events currently displayed (last hour)... */  
   textFont(countFont);
   textAlign(LEFT);
   fill(COUNT_COLOR);
-  text(markers.size(), 50, height/2 + textAscent()/2);
+  text(markers.count(), 50, height/2 + textAscent()/2);
   
   /* The last event... */
   textFont(eventFont);
@@ -134,13 +128,7 @@ void draw() {
   popMatrix();
 
   /* Update the markers (do this last to always be on top)... */
-  synchronized (markers) {
-    Iterator<PlaceMarker> iterator = markers.iterator();
-  
-    while (iterator.hasNext()) {
-      iterator.next().draw();
-    }
-  }
+  markers.draw();
 }
 
 
@@ -238,7 +226,7 @@ void receive(byte[] data, String ip, int port) {
     logfile.flush();
   }
   
-  markers.add(new PlaceMarker(code.x, code.y));
+  markers.add(code.x, code.y);
     
   /* Update the place of the most recent marker... */
   lastEvent = String.format("%d:%02d - %s", h, m, code.place);
