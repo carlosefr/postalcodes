@@ -23,11 +23,17 @@
  */
 
 
+// The maximum number of static markers at each location...
+final int MAX_STATIC_MARKERS = 5;  // Depends on STATIC_OPACITY in "PlaceMarker.pde"...
+
+
 public class PlaceMarkers {
   private List<PlaceMarker> markers;
+  private Map<String,Integer> counters;
   
   public PlaceMarkers() {
     this.markers = new LinkedList<PlaceMarker>();
+    this.counters = new HashMap<String,Integer>();
   }
 
   public synchronized int count() {
@@ -41,10 +47,11 @@ public class PlaceMarkers {
   public synchronized void clean() {
     Iterator<PlaceMarker> iterator = markers.iterator();
 
+    // Remove dead markers...
     while (iterator.hasNext()) {
       PlaceMarker marker = iterator.next();
 
-      /* The markers are ordered, stop on the first unfinished one... */
+      // The markers are ordered, stop on the first unfinished one...
       if (!marker.finished()) {
         break;
       }
@@ -54,10 +61,24 @@ public class PlaceMarkers {
   }
   
   public synchronized void draw() {
+    this.counters.clear();
+
     Iterator<PlaceMarker> iterator = markers.iterator();
 
     while (iterator.hasNext()) {
       PlaceMarker marker = iterator.next();
+      
+      // Limit the number of static markers at the same location...
+      if (!marker.exploding()) {
+        String key = String.format("%d,%d", marker.x, marker.y);
+        int count = this.counters.containsKey(key) ? this.counters.get(key) : 0;
+        
+        this.counters.put(key, count + 1);
+        
+        if (count >= MAX_STATIC_MARKERS) {
+          continue;
+        }
+      }
       
       marker.draw();
     }

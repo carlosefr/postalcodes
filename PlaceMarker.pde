@@ -23,15 +23,18 @@
  */
 
 
-/* Initial animation (times in milliseconds)... */
+// Initial animation (times in milliseconds)...
 final int DURATION = 3000;
 final int FADE = 500;
 final int MAX_RADIUS = 30;
 
-/* Time on screen (milliseconds)... */
+// Time on screen (milliseconds)...
 final int REMAIN = 3600000;
 
-/* Marker colors... */
+// The opacity for non-animated markers...
+final float STATIC_OPACITY = 128;
+
+// Marker colors...
 final color INNER_COLOR = #d72f28;
 final color OUTER_COLOR = #379566;
 
@@ -90,11 +93,11 @@ public class PlaceMarker {
     pushStyle();
 
     noStroke();
-    fill(INNER_COLOR, 128);
+    fill(INNER_COLOR, STATIC_OPACITY);
     
     ellipse(this.x, this.y, MAX_RADIUS/4.0, MAX_RADIUS/4.0);
     
-    stroke(OUTER_COLOR, 128);
+    stroke(OUTER_COLOR, STATIC_OPACITY);
     strokeWeight(MAX_RADIUS/8.0);
     noFill();
     
