@@ -26,6 +26,8 @@
 import hypermedia.net.*;
 
 
+final short TARGET_FRAMERATE = 30;
+
 // The three portuguese regions...
 final short REGION_PT = 0;
 final short REGION_AZ = 1;
@@ -63,7 +65,7 @@ String lastEvent = "";
 
 void setup() {
   size(1280, 768, JAVA2D);
-  frameRate(30);
+  frameRate(TARGET_FRAMERATE);
   smooth();
   
   // Hide the cursor when in "present/fullscreen" mode...
@@ -96,6 +98,11 @@ void setup() {
 
 
 void draw() {
+  // Avoid drawing continuously when there's nothing going on...
+  if (frameCount % TARGET_FRAMERATE != 0 && markers.exploding() == 0 && frameCount > 1) {
+    return;
+  }
+  
   // On the Mac this is *much* faster than using background()...
   image(artwork, 0, 0);
 
@@ -118,7 +125,7 @@ void draw() {
   pushMatrix();
   noStroke();
   translate(width - 30, height - 30);
-  rotate(radians(millis() / 3));
+  rotate(frameCount/TARGET_FRAMERATE * QUARTER_PI);
 
   fill(BEAT_COLOR_1);
   ellipse(-BEAT_RADIUS/2, -BEAT_RADIUS/2, BEAT_RADIUS, BEAT_RADIUS);

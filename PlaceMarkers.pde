@@ -30,6 +30,7 @@ final int MAX_STATIC_MARKERS = 5;  // Depends on STATIC_OPACITY in "PlaceMarker.
 public class PlaceMarkers {
   private List<PlaceMarker> markers;
   private Map<String,Integer> counters;
+  private int statics;
   
   public PlaceMarkers() {
     this.markers = new LinkedList<PlaceMarker>();
@@ -38,6 +39,10 @@ public class PlaceMarkers {
 
   public synchronized int count() {
     return this.markers.size();
+  }
+  
+  public synchronized int exploding() {
+    return this.markers.size() - this.statics;
   }
 
   public synchronized void add(int x, int y) {
@@ -62,6 +67,7 @@ public class PlaceMarkers {
   
   public synchronized void draw() {
     this.counters.clear();
+    this.statics = 0;
 
     Iterator<PlaceMarker> iterator = markers.iterator();
 
@@ -74,6 +80,7 @@ public class PlaceMarkers {
         int count = this.counters.containsKey(key) ? this.counters.get(key) : 0;
         
         this.counters.put(key, count + 1);
+        this.statics++;
         
         if (count >= MAX_STATIC_MARKERS) {
           continue;
