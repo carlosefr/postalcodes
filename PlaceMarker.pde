@@ -26,7 +26,10 @@
 // Initial animation (times in milliseconds)...
 final int DURATION = 3000;
 final int FADE = 500;
-final int MAX_RADIUS = 30;
+
+// The radius for the inner circle...
+final int MAX_RADIUS = 50;
+final int STATIC_RADIUS = 7;
 
 // Time on screen (milliseconds)...
 final int REMAIN = 3600000;
@@ -95,13 +98,13 @@ public class PlaceMarker {
     noStroke();
     fill(INNER_COLOR, STATIC_OPACITY);
     
-    ellipse(this.x, this.y, MAX_RADIUS/4.0, MAX_RADIUS/4.0);
+    ellipse(this.x, this.y, STATIC_RADIUS, STATIC_RADIUS);
     
     stroke(OUTER_COLOR, STATIC_OPACITY);
-    strokeWeight(MAX_RADIUS/8.0);
+    strokeWeight(STATIC_RADIUS/3.0);
     noFill();
     
-    ellipse(this.x, this.y, MAX_RADIUS/2.0, MAX_RADIUS/2.0);
+    ellipse(this.x, this.y, STATIC_RADIUS*2, STATIC_RADIUS*2);
 
     popStyle();
   }
