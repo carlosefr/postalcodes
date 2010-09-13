@@ -37,13 +37,11 @@ final int REMAIN = 3600000;
 // The opacity for non-animated markers...
 final float STATIC_OPACITY = 128;
 
-// Marker colors...
-final color INNER_COLOR = #d72f28;
-final color OUTER_COLOR = #379566;
-
 
 public class PlaceMarker {
   private int start;
+  private color innerColor;
+  private color outerColor;
   
   public int x;
   public int y;
@@ -52,6 +50,10 @@ public class PlaceMarker {
     this.start = millis();
     this.x = x;
     this.y = y;
+    
+    // Get the colors from the global properties...
+    this.innerColor = colors.get("INNER_COLOR");
+    this.outerColor = colors.get("OUTER_COLOR");
   }
 
   public void draw() {
@@ -79,11 +81,11 @@ public class PlaceMarker {
     float radius = map(sqrt(2*elapsed*DURATION - sq(elapsed)), 0, DURATION, 0, MAX_RADIUS);
     
     noStroke();
-    fill(INNER_COLOR, opacity);
+    fill(this.innerColor, opacity);
     
     ellipse(this.x, this.y, radius, radius);
     
-    stroke(OUTER_COLOR, opacity);
+    stroke(this.outerColor, opacity);
     strokeWeight(radius/3.0);
     noFill();
     
@@ -96,11 +98,11 @@ public class PlaceMarker {
     pushStyle();
 
     noStroke();
-    fill(INNER_COLOR, STATIC_OPACITY);
+    fill(this.innerColor, STATIC_OPACITY);
     
     ellipse(this.x, this.y, STATIC_RADIUS, STATIC_RADIUS);
     
-    stroke(OUTER_COLOR, STATIC_OPACITY);
+    stroke(this.outerColor, STATIC_OPACITY);
     strokeWeight(STATIC_RADIUS/3.0);
     noFill();
     

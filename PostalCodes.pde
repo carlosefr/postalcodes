@@ -39,15 +39,10 @@ final float RATIO_AC = 2.2222;
 final float RATIO_MA = 1.7252;
 
 // "Heartbeat"...
-final color BEAT_COLOR_1 = #d72f28;
-final color BEAT_COLOR_2 = #379566;
 final short BEAT_RADIUS = 8;
 
-// The text showing the last event...
-final color EVENT_COLOR = #000000;
-
-// The text showing the event counter...
-final color COUNT_COLOR = #000000;
+// Global color palette...
+Map<String,Integer> colors;
 
 int[][] bounds;
 Map<String,PostalCode> codes;
@@ -59,6 +54,10 @@ PrintWriter logfile;
 
 PFont eventFont;
 PFont countFont;
+
+color eventColor;
+color countColor;
+color[] beatColors;
 
 String lastEvent = "";
 
@@ -74,12 +73,19 @@ void setup() {
   }
   
   bounds = regionBounds(50);
-
   codes = Collections.unmodifiableMap(loadPostalCodes("postalcodes.txt", bounds));
-
   logfile = createWriter("postalcodes.log");
   
+  // These two external resources define the overall look of the application...
   artwork = loadImage(String.format("background-%dx%d.png", width, height));
+  colors = loadColors("colors.properties");
+
+  // Save the colors to avoid a "get" on each draw...
+  beatColors = new color[2];
+  beatColors[0] = colors.get("INNER_COLOR");
+  beatColors[1] = colors.get("OUTER_COLOR");
+  eventColor = colors.get("EVENT_COLOR");
+  countColor = colors.get("COUNT_COLOR");
 
   eventFont = loadFont("Verdana-Bold-18.vlw");
   countFont = loadFont("Arial-Black-144.vlw");
@@ -112,13 +118,13 @@ void draw() {
   // The counter of events currently displayed (last hour)...
   textFont(countFont);
   textAlign(LEFT);
-  fill(COUNT_COLOR);
+  fill(countColor);
   text(markers.count(), 50, height/2 + textAscent()/2);
   
   // The last event...
   textFont(eventFont);
   textAlign(RIGHT);
-  fill(EVENT_COLOR);
+  fill(eventColor);
   text(lastEvent, width - 60, height - 30 + textAscent()/2);
   
   // Two rotating circles ("heartbeat")...
@@ -127,10 +133,10 @@ void draw() {
   translate(width - 30, height - 30);
   rotate(frameCount/TARGET_FRAMERATE * QUARTER_PI);
 
-  fill(BEAT_COLOR_1);
+  fill(beatColors[0]);
   ellipse(-BEAT_RADIUS/2, -BEAT_RADIUS/2, BEAT_RADIUS, BEAT_RADIUS);
 
-  fill(BEAT_COLOR_2);
+  fill(beatColors[1]);
   ellipse(BEAT_RADIUS/2, BEAT_RADIUS/2, BEAT_RADIUS, BEAT_RADIUS);
   popMatrix();
 
@@ -195,6 +201,27 @@ Map<String,PostalCode> loadPostalCodes(String filename, int[][] bounds) {
   }
   
   return codes;
+}
+
+
+Map<String,Integer> loadColors(String filename) {
+  Map<String,Integer> colors = new HashMap<String,Integer>();
+  Properties props = new Properties();
+
+  try {
+    props.load(createReader(filename));
+  } catch (IOException e) {
+    e.printStackTrace();
+    
+    return null;
+  }
+  
+  colors.put("EVENT_COLOR", unhex(props.getProperty("event_text", "000000")) | 0xff000000);
+  colors.put("COUNT_COLOR", unhex(props.getProperty("count_text", "000000")) | 0xff000000);
+  colors.put("INNER_COLOR", unhex(props.getProperty("inner_marker", "d72f28")) | 0xff000000);
+  colors.put("OUTER_COLOR", unhex(props.getProperty("outer_marker", "379566")) | 0xff000000);
+  
+  return colors;
 }
 
 
