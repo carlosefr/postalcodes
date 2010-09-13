@@ -29,7 +29,7 @@ final int FADE = 500;
 
 // The radius for the inner circle...
 final int MAX_RADIUS = 50;
-final int STATIC_RADIUS = 7;
+final int STATIC_RADIUS = 10; 
 
 // Time on screen (milliseconds)...
 final int REMAIN = 3600000;
