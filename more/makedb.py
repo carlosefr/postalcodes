@@ -111,27 +111,43 @@ def download(url):
     return datafile
 
 
-def process(ifile, ofile):
+def process(ifile, ofile, efile):
+    codes = {}
+
+    # Gather the codes from the errata...
+    f = open(efile, "r")
+
+    for line in f:
+        line.rstrip()
+        fields = line.split("|")
+
+        codes[fields[0]] = (fields[1], float(fields[2]), float(fields[3]))
+
+    f.close()
+
+    # Gather the codes from the main database...
     f = open(ifile, "r")
 
-    plain_codes = set()
-
-    # To prune duplicate lines...
-    output = set()
-
-    for line in sorted(f):
-        line.rstrip("\n")
+    for line in f:
+        line.rstrip("\r\n")
         fields = line.split("\t")
 
         # Skip codes without coordinates...
         if not len(fields[9]) or not len(fields[10]):
             continue
 
-        code = fields[1]
-        place = fields[2]
-        lat = float(fields[9])
-        lon = float(fields[10])
+        if fields[1] in codes:
+            continue
 
+        codes[fields[1]] = (fields[2], float(fields[9]), float(fields[10]))
+
+    f.close()
+
+    output = set()
+    plain_codes = set()
+
+    for code in sorted(codes.iterkeys()):
+        place, lat, lon = codes[code]
         region = find_region(lat, lon)
 
         # Skip codes outside valid regions...
@@ -145,13 +161,11 @@ def process(ifile, ofile):
         output.add("%s|%s|%d|%g|%g" % (code, place, region, x, y))
 
         # Hack: improve the data by adding simple/shortened codes...
-        plain_code = code.split("-")[0]
+        plain_code = code.split("-")[0] + "-000"
 
-        if plain_code not in plain_codes:
+        if plain_code not in codes and plain_code not in plain_codes:
             plain_codes.add(plain_code)
-            output.add("%s-000|%s|%d|%g|%g" % (plain_code, place, region, x, y))
-
-    f.close()
+            output.add("%s|%s|%d|%g|%g" % (plain_code, place, region, x, y))
 
     f = open(ofile, "w")
 
@@ -169,7 +183,7 @@ if __name__ == "__main__":
 
     datafile = "PT.txt"
     sys.stdout.write("Generating the file \"%s\"...\n" % ofile)
-    process(datafile, ofile)
+    process(datafile, ofile, "errata.txt")
 
     os.remove(datafile)
     sys.stdout.write("Finished!\n");
