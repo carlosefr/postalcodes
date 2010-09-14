@@ -25,7 +25,7 @@
 #
 
 
-from __future__ import division;
+from __future__ import division
 
 import os, os.path
 import sys

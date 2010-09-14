@@ -25,7 +25,7 @@
 #
 
 
-from __future__ import division;
+from __future__ import division
 
 import os, os.path
 import sys
@@ -186,7 +186,7 @@ if __name__ == "__main__":
     process(datafile, ofile, "errata.txt")
 
     os.remove(datafile)
-    sys.stdout.write("Finished!\n");
+    sys.stdout.write("Finished!\n")
 
 
 # vim: set expandtab ts=4 sw=4:
