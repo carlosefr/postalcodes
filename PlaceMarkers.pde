@@ -45,8 +45,8 @@ public class PlaceMarkers {
     return this.markers.size() - this.statics;
   }
 
-  public synchronized void add(int x, int y) {
-    this.markers.add(new PlaceMarker(x, y));
+  public synchronized void add(int x, int y, String place) {
+    this.markers.add(new PlaceMarker(x, y, place));
   }
   
   public synchronized void clean() {

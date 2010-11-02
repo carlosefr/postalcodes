@@ -187,8 +187,8 @@ Map<String,PostalCode> loadPostalCodes(String filename, int[][] bounds) {
       int region = int(fields[2]);
       
       // Convert the [0,1] ranged locations to screen coordinates...
-      int x = round(map(float(fields[3]), 0, 1, bounds[region][0], bounds[region][2]));
-      int y = round(map(float(fields[4]), 0, 1, bounds[region][1], bounds[region][3]));
+      int x = round(lerp(bounds[region][0], bounds[region][2], float(fields[3])));
+      int y = round(lerp(bounds[region][1], bounds[region][3], float(fields[4])));
       
       PostalCode place = new PostalCode(fields[0], fields[1], region, x, y);
       
@@ -220,6 +220,7 @@ Map<String,Integer> loadColors(String filename) {
   colors.put("COUNT_COLOR", unhex(props.getProperty("count_text", "000000")) | 0xff000000);
   colors.put("INNER_COLOR", unhex(props.getProperty("inner_marker", "d72f28")) | 0xff000000);
   colors.put("OUTER_COLOR", unhex(props.getProperty("outer_marker", "379566")) | 0xff000000);
+  colors.put("PLACE_COLOR", unhex(props.getProperty("place_marker", "000000")) | 0xff000000);
   
   return colors;
 }
@@ -260,7 +261,7 @@ void receive(byte[] data, String ip, int port) {
     logfile.flush();
   }
   
-  markers.add(code.x, code.y);
+  markers.add(code.x, code.y, code.place);
     
   // Update the place of the most recent marker...
   lastEvent = String.format("%d:%02d - %s", h, m, code.place);

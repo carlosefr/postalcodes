@@ -42,18 +42,22 @@ public class PlaceMarker {
   private int start;
   private color innerColor;
   private color outerColor;
+  private color placeColor;
   
   public int x;
   public int y;
+  public String place;
   
-  public PlaceMarker(int x, int y) {
+  public PlaceMarker(int x, int y, String place) {
     this.start = millis();
     this.x = x;
     this.y = y;
+    this.place = place;
     
     // Get the colors from the global properties...
     this.innerColor = colors.get("INNER_COLOR");
     this.outerColor = colors.get("OUTER_COLOR");
+    this.placeColor = colors.get("PLACE_COLOR");
   }
 
   public void draw() {
@@ -90,6 +94,11 @@ public class PlaceMarker {
     noFill();
     
     ellipse(this.x, this.y, radius*2, radius*2);
+
+    textFont(eventFont);
+    textAlign(RIGHT);
+    fill(this.placeColor, opacity);
+    text(this.place, this.x - radius*cos(radians(15)) - 10, this.y - radius*sin(radians(15)) - 10);
 
     popStyle();
   }
