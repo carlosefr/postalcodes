@@ -51,6 +51,7 @@ PlaceMarkers markers;
 PImage artwork;
 UDP server;
 PrintWriter logfile;
+SnowFall snow;
 
 PFont eventFont;
 PFont countFont;
@@ -92,6 +93,9 @@ void setup() {
 
   markers = new PlaceMarkers();
 
+  // Enable some light snowfall...
+  // snow = new SnowFall(0.15);
+
   server = new UDP(this, 15001);
   server.listen(true);
 
@@ -104,8 +108,8 @@ void setup() {
 
 
 void draw() {
-  // Avoid drawing continuously when there's nothing going on...
-  if (frameCount % TARGET_FRAMERATE != 0 && markers.exploding() == 0 && frameCount > 1) {
+  // Draw only once a second unless there's something that requires continuous drawing...
+  if (frameCount > 1 && frameCount % TARGET_FRAMERATE != 0 && markers.exploding() == 0 && snow == null) {
     return;
   }
   
@@ -142,6 +146,12 @@ void draw() {
 
   // Update the markers (do this last to always be on top)...
   markers.draw();
+
+  if (snow != null) {
+    // It's snowing...
+    snow.update();
+    snow.draw();
+  }
 }
 
 
