@@ -57,7 +57,11 @@ public class SnowFall {
     Iterator<SnowFlake> iterator = this.flakes.iterator();
     
     while (iterator.hasNext()) {
-      iterator.next().update();
+      SnowFlake flake = iterator.next();
+      
+      // Variable wind (always right to left)...
+      flake.setWind((sin(frameCount * 0.01) - 1.0) * 0.5);
+      flake.update();
     }
     
     // Create some new flakes...

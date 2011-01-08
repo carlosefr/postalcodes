@@ -29,28 +29,41 @@ public class SnowFlake {
   
   private int start;
   private float radius;
+  private float wind;
   
   public SnowFlake(int x, float radius) {
     this.x = x;
     this.y = 0;
     this.radius = radius;
+    this.wind = 0;
 
     // We'll use this as a random seed of sorts...    
     this.start = x;
   }
   
-  public boolean finished() {
-    return this.x < 0 || this.x >= width ||
-           this.y < 0 || this.y >= height;
+  public void setWind(float wind) {
+    this.wind = wind;
   }
   
-  public void update() {    
-    // Introduce a little turbulence to the falling motion...
-    this.x -= (0.2 + sin((this.start + frameCount) * 0.1) * 0.4);
+  public boolean finished() {
+    return this.y >= height;
+  }
+  
+  public void update() {
+    // Falling motion...    
+    this.x += this.wind;
     this.y += 2.0;
+
+    // Introduce a little turbulence to the falling motion...
+    this.x += sin((this.start + frameCount) * 0.1) * 0.4;
   }
   
   public void draw() {
+    if (this.x + this.radius < 0 || this.x - this.radius > width) {
+      // The flake is off the screen, do nothing...
+      return;
+    }
+    
     pushStyle();
     
     stroke(#777777);
