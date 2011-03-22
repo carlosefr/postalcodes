@@ -67,6 +67,7 @@ public class SnowFlake {
     pushStyle();
     
     stroke(#777777);
+    strokeWeight(1);
     fill(#ffffff);   
     ellipse(this.x, this.y, this.radius*2, this.radius*2);
     

@@ -29,7 +29,7 @@ final int FADE = 500;
 
 // The radius for the inner circle...
 final int MAX_RADIUS = 50;
-final int STATIC_RADIUS = 10; 
+final int STATIC_RADIUS = 10;
 
 // Time on screen (milliseconds)...
 final int REMAIN = 3600000;
@@ -76,24 +76,60 @@ public class PlaceMarker {
     return millis() - this.start > REMAIN;
   }
   
-  private void explode() {
+  private void drawMarker(float radius, float opacity) {
     pushStyle();
+    pushMatrix();
 
+    translate(this.x, this.y);
+  
+    // Inner circle...
+    noStroke();
+    fill(this.innerColor, opacity);
+    ellipse(0, 0, radius, radius);
+
+    // Outer circle...        
+    float outerWidth = radius/3.0;
+    
+    if (glRendererEnabled()) {
+      // The OpenGL renderer doesn't support stroke weights > 1...
+      noStroke();
+      fill(this.outerColor, opacity);
+
+      // Higher resolution, more triangles...
+      int resolution = round(radius * 3);
+      
+      beginShape(TRIANGLE_STRIP);
+      
+      for (int i = 0; i < resolution + 3; i++) {
+        float angle = (TWO_PI / resolution) * i;
+        float r = radius + (outerWidth/2.0) * (i % 2 == 0 ? 1 : -1);
+        
+        vertex(r*cos(angle), r*sin(angle));
+      }
+      
+      endShape();
+    } else {
+      // Fortunately, the other renderers do...
+      stroke(this.outerColor, opacity);
+      strokeWeight(outerWidth);
+      noFill();
+      
+      ellipse(0, 0, radius*2, radius*2);
+    }
+    
+    popMatrix();
+    popStyle();
+  }
+  
+  private void explode() {
     int elapsed = millis() - this.start;
         
     float opacity = elapsed <= DURATION - FADE ? 255 : map(DURATION - elapsed, FADE, 0, 255, 0);
     float radius = map(sqrt(2*elapsed*DURATION - sq(elapsed)), 0, DURATION, 0, MAX_RADIUS);
     
-    noStroke();
-    fill(this.innerColor, opacity);
-    
-    ellipse(this.x, this.y, radius, radius);
-    
-    stroke(this.outerColor, opacity);
-    strokeWeight(radius/3.0);
-    noFill();
-    
-    ellipse(this.x, this.y, radius*2, radius*2);
+    this.drawMarker(radius, opacity);
+
+    pushStyle();
 
     textFont(eventFont);
     textAlign(RIGHT);
@@ -104,20 +140,7 @@ public class PlaceMarker {
   }
   
   private void stay() {
-    pushStyle();
-
-    noStroke();
-    fill(this.innerColor, STATIC_OPACITY);
-    
-    ellipse(this.x, this.y, STATIC_RADIUS, STATIC_RADIUS);
-    
-    stroke(this.outerColor, STATIC_OPACITY);
-    strokeWeight(STATIC_RADIUS/3.0);
-    noFill();
-    
-    ellipse(this.x, this.y, STATIC_RADIUS*2, STATIC_RADIUS*2);
-
-    popStyle();
+    this.drawMarker(STATIC_RADIUS, STATIC_OPACITY);
   }
 }
 
