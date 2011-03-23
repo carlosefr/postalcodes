@@ -42,7 +42,7 @@ final float RATIO_AC = 2.2222;
 final float RATIO_MA = 1.7252;
 
 // "Heartbeat"...
-final short BEAT_RADIUS = 8;
+final short BEAT_RADIUS = 4;
 
 // Global color palette...
 Map<String,Integer> colors;
@@ -147,10 +147,10 @@ void draw() {
   rotate(frameCount/TARGET_FRAMERATE * QUARTER_PI);
 
   fill(beatColors[0]);
-  ellipse(-BEAT_RADIUS/2, -BEAT_RADIUS/2, BEAT_RADIUS, BEAT_RADIUS);
+  ellipse(-BEAT_RADIUS, -BEAT_RADIUS, BEAT_RADIUS*2, BEAT_RADIUS*2);
 
   fill(beatColors[1]);
-  ellipse(BEAT_RADIUS/2, BEAT_RADIUS/2, BEAT_RADIUS, BEAT_RADIUS);
+  ellipse(BEAT_RADIUS, BEAT_RADIUS, BEAT_RADIUS*2, BEAT_RADIUS*2);
   popMatrix();
 
   // Update the markers (do this last to always be on top)...
