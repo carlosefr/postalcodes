@@ -316,4 +316,12 @@ void writeTemplate(String filename, Map<String,PostalCode> codes, int[][] bounds
 }
 
 
+void keyReleased() {
+  // Save a snapshot...
+  if (key == 'c') {
+    saveFrame("PostalCodes-" + frameCount + ".png");
+  }
+}
+
+
 /* EOF - PostalCodes.pde */
