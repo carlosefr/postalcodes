@@ -58,6 +58,7 @@ SnowFall snow;
 
 PFont eventFont;
 PFont countFont;
+PFont labelFont;
 
 color eventColor;
 color countColor;
@@ -99,6 +100,7 @@ void setup() {
 
   eventFont = loadFont("Verdana-Bold-18.vlw");
   countFont = loadFont("Arial-Black-144.vlw");
+  labelFont = loadFont("Verdana-17.vlw");
 
   markers = new PlaceMarkers();
 
@@ -118,7 +120,11 @@ void setup() {
 
 void draw() {
   // Draw only once a second unless there's something that requires continuous drawing...
-  if (frameCount > 1 && frameCount % TARGET_FRAMERATE != 0 && markers.exploding() == 0 && snow == null) {
+  if (frameCount > 2 && frameCount % TARGET_FRAMERATE != 0 && markers.exploding() == 0 && snow == null) {
+    /*
+     * There seems to be an OpenGL issue where sometimes the screen starts flashing on startup.
+     * Drawing the first two frames seems to mitigate the problem, but does not eliminate it completely.
+     */
     return;
   }
   
@@ -128,16 +134,25 @@ void draw() {
   // Remove the expired markers...
   markers.clean();
 
-  // The counter of events currently displayed (last hour)...
-  textFont(countFont);
-  textAlign(LEFT);
+  // The counter of events currently displayed...
   fill(countColor);
-  text(markers.count(), 50, height/2 + textAscent()/2);
+  textAlign(LEFT);
+
+  // The actual number of events...
+  textFont(countFont);
+  float baseline = height/2 + textAscent()/2;
+  text(markers.count(), 50, baseline);
+  
+  // The time span the counter refers to...
+  int minutes = millis() / 60000;
+  String label = (minutes < 60) ? String.format("nos últimos %d minutos", minutes) : "na última hora";
+  textFont(labelFont);
+  text(label, 60, baseline + textAscent() + 15);
   
   // The last event...
-  textFont(eventFont);
-  textAlign(RIGHT);
   fill(eventColor);
+  textAlign(RIGHT);
+  textFont(eventFont);
   text(lastEvent, width - 60, height - 30 + textAscent()/2);
   
   // Two rotating circles ("heartbeat")...
