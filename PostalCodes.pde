@@ -269,12 +269,12 @@ void receive(byte[] data, String ip, int port) {
   String label = String.format("%d-%02d-%02d %02d:%02d:%02d [%s:%d]", year(), month(), day(), h, m, second(), ip, port);
   
   /*
-   * The accepted message format is made up of two (comma-separated) parts:
+   * The event is made up of two comma-separated parts:
    *
    *   1. The postal code in extended portuguese format (PT-1994);
-   *   2. An optional alphanumeric tag identifying the agent (eg. a PID).
+   *   2. An optional tag identifying the source agent (eg. a PID).
    */
-  if (!message.matches("^\\d{4}-\\d{3}(?:,[A-Za-z0-9]{1,16})?$")) {
+  if (!message.matches("^\\d{4}-\\d{3}(,\\w{1,16})?$")) {
     logfile.println(label + ": invalid data");
     logfile.flush();
     

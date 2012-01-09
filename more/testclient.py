@@ -32,17 +32,18 @@ import sys
 import socket
 import time
 import random
+import re
 
 from getopt import getopt, GetoptError
 
 
 def print_usage():
-    sys.stdout.write("USAGE: %s [-h <hostname>] [-p <port>] [-r <rate>] -f <postalcodes.txt>\n" % os.path.basename(sys.argv[0]))
+    sys.stdout.write("USAGE: %s [-h <hostname>] [-p <port>] [-r <rate>] [-t tag] -f <postalcodes.txt>\n" % os.path.basename(sys.argv[0]))
 
 
 def parse_args():
     try:
-        options, args = getopt(sys.argv[1:], "h:p:r:f:", ["hostname=", "port=", "rate=", "file="])
+        options, args = getopt(sys.argv[1:], "h:p:r:t:f:", ["hostname=", "port=", "rate=", "tag=", "file="])
     except GetoptError, e:
         sys.stderr.write("error: %s\n" % e)
         print_usage()
@@ -51,6 +52,7 @@ def parse_args():
     hostname = "127.0.0.1" 
     port = 15001
     rate = 4  # ...per second
+    tag = "PID%d" % os.getpid()
     ifile = None
         
     for option, value in options:
@@ -60,19 +62,25 @@ def parse_args():
             port = int(value)
         elif option in ("-r", "--rate"):
             rate = float(value)
+        elif option in ("-t", "--tag"):
+            tag = value
         elif option in ("-f", "--file"):
             ifile = value
-    
+   
+    if not re.match("^\w{1,16}$", tag):
+        sys.stderr.write("error: malformed tag\n")
+        sys.exit(1)
+
     if ifile == None:
         sys.stderr.write("error: parameter(s) missing\n")
         print_usage()
         sys.exit(1)
 
-    return (hostname, port, rate, ifile)
+    return (hostname, port, rate, tag, ifile)
 
 
 if __name__ == "__main__":
-    (hostname, port, rate, ifile) = parse_args()
+    (hostname, port, rate, tag, ifile) = parse_args()
 
     f = open(ifile, "r")
 
@@ -91,7 +99,7 @@ if __name__ == "__main__":
         # In a real client we don't want it to terminate if the graphical application
         # can't be reached. We want it to keep running and recover automatically.
         try:
-            udp.sendto("%s,PID%d" % (random.choice(codes), os.getpid()), address)
+            udp.sendto("%s,%s" % (random.choice(codes), tag), address)
         except socket.error:
             pass
 
