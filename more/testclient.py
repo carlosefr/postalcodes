@@ -91,7 +91,7 @@ if __name__ == "__main__":
         # In a real client we don't want it to terminate if the graphical application
         # can't be reached. We want it to keep running and recover automatically.
         try:
-            udp.sendto(random.choice(codes), address)
+            udp.sendto("%s,PID%d" % (random.choice(codes), os.getpid()), address)
         except socket.error:
             pass
 

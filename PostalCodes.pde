@@ -266,32 +266,44 @@ void receive(byte[] data, String ip, int port) {
   int h = hour();
   int m = minute();
   
-  String ts = String.format("%d-%02d-%02d %02d:%02d:%02d [%s:%d]", year(), month(), day(), h, m, second(), ip, port);
+  String label = String.format("%d-%02d-%02d %02d:%02d:%02d [%s:%d]", year(), month(), day(), h, m, second(), ip, port);
   
-  if (!message.matches("^\\d{4}-\\d{3}$")) {
-    logfile.println(ts + ": invalid data");
+  /*
+   * The accepted message format is made up of two (comma-separated) parts:
+   *
+   *   1. The postal code in extended portuguese format (PT-1994);
+   *   2. An optional alphanumeric tag identifying the agent (eg. a PID).
+   */
+  if (!message.matches("^\\d{4}-\\d{3}(?:,[A-Za-z0-9]{1,16})?$")) {
+    logfile.println(label + ": invalid data");
     logfile.flush();
     
     return;
   }
   
-  PostalCode code = codes.get(message);
+  String[] parts = split(message, ",");
+
+  // Extend the logging label with the agent tag...  
+  label += (parts.length > 1) ? String.format(" [%s]", parts[1]) : " []";
+
+  // Obtain the postal code data...
+  PostalCode code = codes.get(parts[0]);
   
   if (code == null) {  // Try the simplified code...
-    code = codes.get(split(message, "-")[0] + "-000");
+    code = codes.get(split(parts[0], "-")[0] + "-000");
 
     if (code == null) {
-      logfile.println(ts + ": not found: " + message);
+      logfile.println(label + ": not found: " + parts[0]);
       logfile.flush();
       
       return;
     }
 
-    logfile.println(ts + ": found (simple): " + code);
+    logfile.println(label + ": found (simple): " + code);
     logfile.flush();
 
   } else {
-    logfile.println(ts + ": found: " + code);
+    logfile.println(label + ": found: " + code);
     logfile.flush();
   }
   
