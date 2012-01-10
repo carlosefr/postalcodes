@@ -122,25 +122,21 @@ public class PlaceMarker {
     popMatrix();
   }
 
-  private void drawMarkerJava2D(float radius, float opacity, PGraphics gfx, float x, float y) {
-    gfx.beginDraw();
-    gfx.smooth();
-    
-    gfx.pushStyle();
+  private void drawMarkerJava2D(float radius, float opacity, PGraphics pg, float x, float y) {
+    pg.pushStyle();
 
     // Inner circle...
-    gfx.noStroke();
-    gfx.fill(this.innerColor, opacity);
-    gfx.ellipse(x, y, radius*2, radius*2);
+    pg.noStroke();
+    pg.fill(this.innerColor, opacity);
+    pg.ellipse(x, y, radius*2, radius*2);
 
     // Outer circle...
-    gfx.noFill();      
-    gfx.stroke(this.outerColor, opacity);
-    gfx.strokeWeight(radius/1.5);
-    gfx.ellipse(x, y, radius*4, radius*4);
+    pg.noFill();      
+    pg.stroke(this.outerColor, opacity);
+    pg.strokeWeight(radius/1.5);
+    pg.ellipse(x, y, radius*4, radius*4);
 
-    gfx.popStyle();
-    gfx.endDraw();
+    pg.popStyle();
   }
 
   private void explode() {
@@ -170,12 +166,16 @@ public class PlaceMarker {
     // The static marker is only drawn once, and then cached...
     if (marker == null) {
       // See the "drawMarkerOpenGL" method for the source of this calculation...
-      int sz = 2 * ceil(STATIC_RADIUS/3.0 + STATIC_RADIUS*2.0);
+      int sz = 2 * ceil((STATIC_RADIUS/1.5)/2.0 + STATIC_RADIUS*2.0);
 
-      PGraphics gfx = createGraphics(sz, sz, JAVA2D);
-      this.drawMarkerJava2D(STATIC_RADIUS, STATIC_OPACITY, gfx, sz/2.0, sz/2.0);
-
-      marker = (PImage)gfx;
+      PGraphics pg = createGraphics(sz, sz, JAVA2D);
+      
+      pg.beginDraw();
+      pg.smooth();
+      this.drawMarkerJava2D(STATIC_RADIUS, STATIC_OPACITY, pg, pg.width/2.0, pg.height/2.0);
+      pg.endDraw();
+      
+      marker = (PImage)pg;
     }
 
     // Just place the cached marker on screen...
