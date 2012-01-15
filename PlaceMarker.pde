@@ -94,12 +94,12 @@ public class PlaceMarker {
     // Inner circle...
     fill(this.innerColor, opacity);
     
-    beginShape(TRIANGLE_STRIP);
+    beginShape(TRIANGLE_FAN);
+    vertex(0, 0);
+    
     for (int i = 0; i <= res; i++) {
       float angle = (TWO_PI / res) * i;
-      float r = (i % 2 == 0 ? radius : 0);
-      
-      vertex(r*cos(angle), r*sin(angle));
+      vertex(radius * cos(angle), radius * sin(angle));
     }
     endShape();
 
