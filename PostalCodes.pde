@@ -25,11 +25,13 @@
 
 import processing.opengl.*;
 import javax.media.opengl.GL;
+import java.net.InetAddress;
 
 import hypermedia.net.*;
 
 
 final short TARGET_FRAMERATE = 30;
+final short SERVER_PORT = 15001;
 
 // The three portuguese regions...
 final short REGION_PT = 0;
@@ -65,6 +67,11 @@ color countColor;
 color[] beatColors;
 
 String lastEvent = "";
+
+// Debugging info...
+Boolean showDebug = false;
+String ipAddress;
+String renderer;
 
 
 void setup() {
@@ -107,9 +114,20 @@ void setup() {
   // Enable some light snowfall...
   // snow = new SnowFall(0.15);
 
-  server = new UDP(this, 15001);
+  server = new UDP(this, SERVER_PORT);
   server.listen(true);
 
+  // Obtain some debugging info...
+  try {
+    ipAddress = InetAddress.getLocalHost().getHostAddress();
+  } catch (UnknownHostException e) {
+    e.printStackTrace();
+    ipAddress = "<unknown>";
+  }
+  
+  String[] pieces = split(g.getClass().getName(), ".");
+  renderer = pieces[pieces.length - 1];
+  
   /*
    * If a suitable background image does not exist, we have to generate one with
    * the three region's boundaries clearly marked to be used as a template...
@@ -167,6 +185,14 @@ void draw() {
   fill(beatColors[1]);
   ellipse(BEAT_RADIUS, BEAT_RADIUS, BEAT_RADIUS*2, BEAT_RADIUS*2);
   popMatrix();
+
+  // Show some debugging information...
+  if (showDebug) {
+    fill(eventColor);
+    textAlign(LEFT);
+    textFont(labelFont);
+    text(String.format("%s@%dfps\n%s:%d/UDP", renderer, round(frameRate), ipAddress, SERVER_PORT), 30, height - 30 - textAscent());
+  }
 
   // Update the markers (do this last to always be on top)...
   markers.draw();
@@ -347,6 +373,11 @@ void keyReleased() {
   // Save a snapshot...
   if (key == 'c') {
     saveFrame("PostalCodes-" + frameCount + ".png");
+  }
+  
+  // Show/hide debugging info...
+  if (key == 'd') {
+    showDebug = !showDebug;
   }
 }
 
