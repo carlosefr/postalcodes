@@ -46,6 +46,10 @@ final float RATIO_MA = 1.7252;
 // "Heartbeat"...
 final short BEAT_RADIUS = 4;
 
+// Easter-egg parameters...
+final short EGG_TRIGGER = 1143;
+final short EGG_DURATION = 5000;  // milliseconds
+
 // Global color palette...
 Map<String,Integer> colors;
 
@@ -67,6 +71,9 @@ color countColor;
 color[] beatColors;
 
 String lastEvent = "";
+
+PImage egg;
+float eggStart = -1;
 
 // Debugging info...
 Boolean showDebug = false;
@@ -116,6 +123,9 @@ void setup() {
 
   server = new UDP(this, SERVER_PORT);
   server.listen(true);
+
+  // The easter-egg image, triggered by a particular counter value...
+  egg = loadImage("egg.png");
 
   // Obtain some debugging info...
   try {
@@ -185,6 +195,16 @@ void draw() {
   fill(beatColors[1]);
   ellipse(BEAT_RADIUS, BEAT_RADIUS, BEAT_RADIUS*2, BEAT_RADIUS*2);
   popMatrix();
+
+  // A small easter-egg: show a picture upon a particular counter value...
+  if (markers.count() == EGG_TRIGGER) {
+    eggStart = millis();
+  }
+  
+  // Show the easter-egg for a few seconds after the fact...
+  if (eggStart > 0 && millis() < eggStart + EGG_DURATION) {
+    image(egg, 0, height - egg.height);
+  }
 
   // Show some debugging information...
   if (showDebug) {
