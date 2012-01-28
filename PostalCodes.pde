@@ -137,12 +137,6 @@ void setup() {
   
   String[] pieces = split(g.getClass().getName(), ".");
   renderer = pieces[pieces.length - 1];
-  
-  /*
-   * If a suitable background image does not exist, we have to generate one with
-   * the three region's boundaries clearly marked to be used as a template...
-   */
-  // writeTemplate(dataPath(String.format("template-%dx%d.png", width, height)), codes, bounds);
 }
 
 
@@ -211,7 +205,7 @@ void draw() {
     fill(eventColor);
     textAlign(LEFT);
     textFont(labelFont);
-    text(String.format("%s@%dfps\n%s:%d/UDP", renderer, round(frameRate), ipAddress, SERVER_PORT), 30, height - 30 - textAscent());
+    text(String.format("%s\n%dx%d@%dfps\n%s:%d/UDP", renderer, width, height, round(frameRate), ipAddress, SERVER_PORT), 30, height - 30 - textAscent()*3.0);
   }
 
   // Update the markers (do this last to always be on top)...
@@ -360,18 +354,20 @@ void receive(byte[] data, String ip, int port) {
 }
 
 
-void writeTemplate(String filename, Map<String,PostalCode> codes, int[][] bounds) {
+void saveFrameTemplate(String filename, Map<String,PostalCode> codes, int[][] bounds) {
   PGraphics pg = createGraphics(width, height, JAVA2D);
   
   pg.beginDraw();
   pg.smooth();
-  pg.background(#ffffff);
+
+  // Start with what's on screen right now...
+  pg.image(get(), 0, 0);
   
-  pg.noFill();
-  pg.stroke(#000000);
+  pg.fill(#fffd66, 128);
+  pg.noStroke();
   
   for (int i = 0; i < bounds.length; i++) {
-    pg.rect(bounds[i][0], bounds[i][1], bounds[i][2]-bounds[i][0], bounds[i][3]-bounds[i][1]);
+    pg.rect(bounds[i][0], bounds[i][1], 1+bounds[i][2]-bounds[i][0], 1+bounds[i][3]-bounds[i][1]);
   }
 
   Iterator<PostalCode> iterator = codes.values().iterator();
@@ -398,6 +394,14 @@ void keyReleased() {
   // Show/hide debugging info...
   if (key == 'd') {
     showDebug = !showDebug;
+  }
+  
+  if (key == 't') {
+    /*
+     * If a suitable background image does not exist, we have to generate one with
+     * the three region's boundaries clearly marked to be used as a template...
+     */
+     saveFrameTemplate(String.format("template-%dx%d.png", width, height), codes, bounds);
   }
 }
 
