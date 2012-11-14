@@ -24,7 +24,6 @@
 
 
 import processing.opengl.*;
-import javax.media.opengl.GL;
 import java.net.InetAddress;
 
 import hypermedia.net.*;
