@@ -35,6 +35,11 @@ public class SnowFall {
     
     // The snow flakes won't be bigger than this...
     this.maxRadius = width / 150.0;
+    
+    // For correct overlapping snowflakes...
+    if (glRendererEnabled()) {
+      hint(ENABLE_ACCURATE_2D);
+    }
   }
   
   public void clean() {

@@ -29,19 +29,14 @@ boolean glRendererEnabled() {
 
 
 void glSetSmooth(boolean enabled) {
-  noSmooth();
-
-  if (enabled) {    
-    smooth(4);
-  }
+  smooth(enabled ? 4 : 0);  // ENABLE_OPENGL_4X_SMOOTH
 }
 
 
 void glSetSync(boolean enabled) {
   PGraphicsOpenGL pgl = (PGraphicsOpenGL)g;
   
-  javax.media.opengl.GL gl = pgl.beginPGL().gl;
-  gl.setSwapInterval(enabled ? 1 : 0);
+  pgl.beginPGL().gl.setSwapInterval(enabled ? 1 : 0);
   pgl.endPGL();
 }
 
