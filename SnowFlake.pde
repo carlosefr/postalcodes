@@ -50,9 +50,9 @@ public class SnowFlake {
   }
   
   public void update() {
-    // Falling motion...    
-    this.x += this.wind;
-    this.y += 2.0;
+    // Falling motion (with a tiny influence of weight)...
+    this.x += 4.0 * (this.wind / this.radius);
+    this.y += 2.0 + (this.radius * 0.05);
 
     // Introduce a little turbulence to the falling motion...
     this.x += sin((this.start + frameCount) * 0.1) * 0.4;
