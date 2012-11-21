@@ -31,6 +31,8 @@ public class SnowFlake {
   private float radius;
   private float wind;
   
+  private PImage flake;
+  
   public SnowFlake(int x, float radius) {
     this.x = x;
     this.y = 0;
@@ -39,6 +41,18 @@ public class SnowFlake {
 
     // We'll use this as a random seed of sorts...    
     this.start = x;
+    
+    // Draw the flake only once...
+    PGraphics pg = createGraphics(int(this.radius*2) + 4, int(this.radius*2) + 4, JAVA2D);
+    
+    pg.beginDraw();
+    pg.smooth();
+    pg.stroke(#777777);
+    pg.fill(#ffffff);   
+    pg.ellipse(pg.width/2.0, pg.height/2.0, this.radius*2, this.radius*2);
+    pg.endDraw();
+    
+    this.flake = (PImage)pg;
   }
   
   public void setWind(float wind) {
@@ -64,14 +78,8 @@ public class SnowFlake {
       return;
     }
     
-    pushStyle();
-    
-    stroke(#777777);
-    strokeWeight(1);
-    fill(#ffffff);   
-    ellipse(this.x, this.y, this.radius*2, this.radius*2);
-    
-    popStyle();
+    // Just place the cached flake on screen...
+    image(this.flake, this.x - this.flake.width/2.0, this.y - this.flake.height/2.0);
   }
 }
 
