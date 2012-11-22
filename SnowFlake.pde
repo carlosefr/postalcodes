@@ -57,11 +57,6 @@ public class SnowFlake {
     
     pg.beginDraw();
 
-    // Debug
-    pg.fill(#ff0000);
-    pg.noStroke();
-    pg.rect(0, 0, pg.width, pg.height);
-
     pg.smooth();
     pg.shapeMode(CENTER);
 
@@ -69,12 +64,10 @@ public class SnowFlake {
     pg.stroke(#aaaaaa);
     pg.translate(pg.width/2.0, pg.height/2.0);
     pg.rotate(random(TWO_PI));
-    pg.shape(svg, 0, 0, pg.width, pg.height);
-
-    // Debug
-    pg.fill(#0000ff);
-    pg.noStroke();
-    pg.ellipse(0, 0, 3, 3);
+    
+    // Maintain the shape aspect ratio...
+    pg.shape(svg, 0, 0, (svg.width < svg.height ? svg.width/svg.height : 1.0) * pg.width,
+                        (svg.width > svg.height ? svg.height/svg.width : 1.0) * pg.height);
 
     pg.endDraw();
     
