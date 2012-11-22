@@ -36,7 +36,7 @@ public class SnowFall {
     this.maxFlakes = round(this.skyWidth * density);
     
     // The snow flakes won't be bigger than this...
-    this.maxRadius = width / 150.0;
+    this.maxRadius = width / 60.0;
   }
   
   public void clean() {

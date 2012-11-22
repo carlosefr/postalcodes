@@ -23,6 +23,10 @@
  */
 
 
+// The snow flake's vectorial shape...
+PShape svg = null;
+
+
 public class SnowFlake {
   private float x;
   private float y;
@@ -42,14 +46,22 @@ public class SnowFlake {
     // We'll use this as a random seed of sorts...    
     this.start = x;
     
-    // Draw the flake only once...
+    // The first flake loads the shape...
+    if (svg == null) {
+      svg = loadShape("snowflake.svg");
+      svg.disableStyle();
+    }
+    
+    // Draw the flake only once...        
     PGraphics pg = createGraphics(int(this.radius*2) + 4, int(this.radius*2) + 4, JAVA2D);
     
     pg.beginDraw();
     pg.smooth();
-    pg.stroke(#777777);
-    pg.fill(#ffffff);   
-    pg.ellipse(pg.width/2.0, pg.height/2.0, this.radius*2, this.radius*2);
+    pg.fill(#ffffff);
+    pg.stroke(#aaaaaa);
+    pg.translate(pg.width/2.0, pg.height/2.0);
+    pg.rotate(random(TWO_PI));
+    pg.shape(svg, -pg.width/2.0, -pg.height/2.0, pg.width, pg.height);
     pg.endDraw();
     
     this.flake = (PImage)pg;
