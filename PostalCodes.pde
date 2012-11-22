@@ -49,6 +49,9 @@ final short BEAT_RADIUS = 4;
 final short EGG_TRIGGER = 1143;
 final short EGG_DURATION = 5000;  // milliseconds
 
+// How much snow to have...
+final float SNOW_DENSITY = 0.15;
+
 // Global color palette...
 Map<String,Integer> colors;
 
@@ -117,8 +120,8 @@ void setup() {
 
   markers = new PlaceMarkers();
 
-  // Enable some light snowfall...
-  // snow = new SnowFall(0.15);
+  // Enable snowfall by default...
+  // snow = new SnowFall(SNOW_DENSITY);
 
   server = new UDP(this, SERVER_PORT);
   server.listen(true);
@@ -393,6 +396,11 @@ void keyReleased() {
   // Show/hide debugging info...
   if (key == 'd') {
     showDebug = !showDebug;
+  }
+  
+  // Toggle snowfall...
+  if (key == 's') {
+    snow = (snow == null ? new SnowFall(SNOW_DENSITY) : null);
   }
   
   if (key == 't') {
