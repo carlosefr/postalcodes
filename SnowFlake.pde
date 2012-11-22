@@ -56,12 +56,26 @@ public class SnowFlake {
     PGraphics pg = createGraphics(int(this.radius*2) + 4, int(this.radius*2) + 4, JAVA2D);
     
     pg.beginDraw();
+
+    // Debug
+    pg.fill(#ff0000);
+    pg.noStroke();
+    pg.rect(0, 0, pg.width, pg.height);
+
     pg.smooth();
+    pg.shapeMode(CENTER);
+
     pg.fill(#ffffff);
     pg.stroke(#aaaaaa);
     pg.translate(pg.width/2.0, pg.height/2.0);
     pg.rotate(random(TWO_PI));
-    pg.shape(svg, -pg.width/2.0, -pg.height/2.0, pg.width, pg.height);
+    pg.shape(svg, 0, 0, pg.width, pg.height);
+
+    // Debug
+    pg.fill(#0000ff);
+    pg.noStroke();
+    pg.ellipse(0, 0, 3, 3);
+
     pg.endDraw();
     
     this.flake = (PImage)pg;
