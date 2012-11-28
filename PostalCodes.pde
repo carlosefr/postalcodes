@@ -392,15 +392,18 @@ void drawInfo() {
     pushStyle();
     textFont(labelFont);
     
-    // We must use "textLeading" to properly calculate line height...
-    textLeading(round(textAscent() + textDescent() + 6.0));
-    float infoHeight = g.textLeading * split(info, "\n").length;
+    // Define an integer line height, to avoid blurring...
+    int lineHeight = round(textAscent() + textDescent() + 6.0);
+    
+    // Set the leading to accurately know the line height...
+    textLeading(lineHeight);
+    int infoHeight = lineHeight * split(info, "\n").length;
     
     pushMatrix();
     translate(30, height - 30 - infoHeight);
     
     noStroke();
-
+    
     fill(#ffffff);
     rectMode(CORNERS);
     rect(-15, -15, textWidth(info) + 15, infoHeight + 15);
