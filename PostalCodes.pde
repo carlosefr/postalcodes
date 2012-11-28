@@ -394,7 +394,7 @@ void drawDebug() {
 
     translate(30, height - ((textAscent() + textDescent())*5.0) - 30);
 
-    fill(#ffffff, 144);
+    fill(#ffffff);
     noStroke();
     rectMode(CORNERS);
     rect(-15, -15, textWidth(debug) + 15, (textAscent() + textDescent())*5.0 + 15);
