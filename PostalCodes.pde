@@ -29,6 +29,8 @@ import java.net.InetAddress;
 import hypermedia.net.*;
 
 
+final String PROGRAM_NAME = "PostalCodes P2.0";
+
 final short TARGET_FRAMERATE = 30;
 final short SERVER_PORT = 15001;
 
@@ -78,7 +80,7 @@ PImage egg;
 float eggStart = -1;
 
 // Debugging info...
-Boolean showDebug = false;
+Boolean showInfo = false;
 String ipAddress;
 
 
@@ -128,7 +130,7 @@ void setup() {
   // The easter-egg image, triggered by a particular counter value...
   egg = loadImage("egg.png");
 
-  // Obtain some debugging info...
+  // Obtain some info...
   try {
     ipAddress = InetAddress.getLocalHost().getHostAddress();
   } catch (UnknownHostException e) {
@@ -207,9 +209,9 @@ void draw() {
     snow.draw();
   }
   
-  // Show some debugging information (on top of everything)...
-  if (showDebug) {
-    drawDebug();
+  // Show some information (on top of everything)...
+  if (showInfo) {
+    drawInfo();
   }
 }
 
@@ -380,27 +382,32 @@ void saveFrameTemplate(String filename, Map<String,PostalCode> codes, int[][] bo
 }
 
 
-void drawDebug() {
-    String debug = String.format("%s\n%dx%d@%dfps\n%s\n%s:%d/UDP", g.getClass().getName(),
-                                                                   width, height, round(frameRate),
-                                                                   glRendererEnabled() ? glGetInfo() : "GL info not available",
-                                                                   ipAddress, SERVER_PORT);
+void drawInfo() {
+    String info = String.format("%s\n%dx%d@%dfps\n%s\n%s\n%s:%d/UDP", PROGRAM_NAME,
+                                                                      width, height, round(frameRate),
+                                                                      g.getClass().getName(),
+                                                                      glRendererEnabled() ? glGetInfo() : "GL info not available",
+                                                                      ipAddress, SERVER_PORT);
     
     pushStyle();
-    pushMatrix();
-    
-    textAlign(LEFT);
     textFont(labelFont);
-
-    translate(30, height - ((textAscent() + textDescent())*5.0) - 30);
+    
+    // We must use "textLeading" to properly calculate line height...
+    textLeading(round(textAscent() + textDescent() + 6.0));
+    float infoHeight = g.textLeading * split(info, "\n").length;
+    
+    pushMatrix();
+    translate(30, height - 30 - infoHeight);
+    
+    noStroke();
 
     fill(#ffffff);
-    noStroke();
     rectMode(CORNERS);
-    rect(-15, -15, textWidth(debug) + 15, (textAscent() + textDescent())*5.0 + 15);
-
+    rect(-15, -15, textWidth(info) + 15, infoHeight + 15);
+    
     fill(#000000);
-    text(debug, 0, textAscent() + textDescent());
+    textAlign(LEFT, BOTTOM);
+    text(info, 0, infoHeight);
     
     popMatrix();
     popStyle();
@@ -413,9 +420,9 @@ void keyReleased() {
     saveFrame("PostalCodes-" + frameCount + ".png");
   }
   
-  // Show/hide debugging info...
-  if (key == 'd') {
-    showDebug = !showDebug;
+  // Show/hide info...
+  if (key == 'i') {
+    showInfo = !showInfo;
   }
   
   // Toggle snowfall...
