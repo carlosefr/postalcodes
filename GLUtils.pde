@@ -41,4 +41,17 @@ void glSetSync(boolean enabled) {
 }
 
 
+String glGetInfo() {
+  PGraphicsOpenGL pgl = (PGraphicsOpenGL)g;
+  
+  javax.media.opengl.GL gl = pgl.beginPGL().gl;
+  String info = String.format("%s, %s, OpenGL %s", gl.glGetString(gl.GL_VENDOR),
+                                                   gl.glGetString(gl.GL_RENDERER),
+                                                   gl.glGetString(gl.GL_VERSION));
+  pgl.endPGL();
+  
+  return info;
+}
+
+
 /* EOF - GLUtils.pde */

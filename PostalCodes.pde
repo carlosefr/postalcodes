@@ -80,7 +80,6 @@ float eggStart = -1;
 // Debugging info...
 Boolean showDebug = false;
 String ipAddress;
-String renderer;
 
 
 void setup() {
@@ -136,9 +135,6 @@ void setup() {
     e.printStackTrace();
     ipAddress = "<unknown>";
   }
-  
-  String[] pieces = split(g.getClass().getName(), ".");
-  renderer = pieces[pieces.length - 1];
 }
 
 
@@ -202,14 +198,6 @@ void draw() {
     image(egg, 0, height - egg.height);
   }
 
-  // Show some debugging information...
-  if (showDebug) {
-    fill(eventColor);
-    textAlign(LEFT);
-    textFont(labelFont);
-    text(String.format("%s\n%dx%d@%dfps\n%s:%d/UDP", renderer, width, height, round(frameRate), ipAddress, SERVER_PORT), 30, height - 30 - textAscent()*3.0);
-  }
-
   // Update the markers (do this last to always be on top)...
   markers.draw();
 
@@ -217,6 +205,11 @@ void draw() {
     // It's snowing...
     snow.update();
     snow.draw();
+  }
+  
+  // Show some debugging information (on top of everything)...
+  if (showDebug) {
+    drawDebug();
   }
 }
 
@@ -384,6 +377,33 @@ void saveFrameTemplate(String filename, Map<String,PostalCode> codes, int[][] bo
 
   pg.endDraw();  
   pg.save(filename);
+}
+
+
+void drawDebug() {
+    String debug = String.format("%s\n%dx%d@%dfps\n%s\n%s:%d/UDP", g.getClass().getName(),
+                                                                   width, height, round(frameRate),
+                                                                   glRendererEnabled() ? glGetInfo() : "GL info not available",
+                                                                   ipAddress, SERVER_PORT);
+    
+    pushStyle();
+    pushMatrix();
+    
+    textAlign(LEFT);
+    textFont(labelFont);
+
+    translate(30, height - ((textAscent() + textDescent())*5.0) - 30);
+
+    fill(#ffffff, 144);
+    noStroke();
+    rectMode(CORNERS);
+    rect(-15, -15, textWidth(debug) + 15, (textAscent() + textDescent())*5.0 + 15);
+
+    fill(#000000);
+    text(debug, 0, textAscent() + textDescent());
+    
+    popMatrix();
+    popStyle();
 }
 
 
