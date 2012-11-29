@@ -383,9 +383,9 @@ void saveFrameTemplate(String filename, Map<String,PostalCode> codes, int[][] bo
 
 
 void drawInfo() {
-    String info = String.format("%s\nJava %s (%s-bit)\n%dx%d@%dfps (%s)\n%s\n%s:%d/UDP",
+    String info = String.format("%s\nJava %s (%s)\n%dx%d@%dfps (%s)\n%s\n%s:%d/UDP",
                                 PROGRAM_NAME,
-                                System.getProperty("java.runtime.version"), System.getProperty("sun.arch.data.model"),
+                                System.getProperty("java.runtime.version"), System.getProperty("os.arch"),
                                 width, height, round(frameRate), g.getClass().getName(),
                                 glRendererEnabled() ? glGetInfo() : "GL info not available",
                                 ipAddress, SERVER_PORT);
