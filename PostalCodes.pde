@@ -23,7 +23,6 @@
  */
 
 
-import processing.opengl.*;
 import java.net.InetAddress;
 import java.util.*;
 import java.net.*;
@@ -87,7 +86,7 @@ String ipAddress;
 
 
 void setup() {
-  size(1280, 768, OPENGL);
+  size(1280, 768, P3D);
   frameRate(TARGET_FRAMERATE);
   smooth();
   
