@@ -38,12 +38,12 @@ from getopt import getopt, GetoptError
 
 
 def print_usage():
-    sys.stdout.write("USAGE: %s [-h <hostname>] [-p <port>] [-r <rate>] [-t tag] -f <postalcodes.txt>\n" % os.path.basename(sys.argv[0]))
+    sys.stdout.write("USAGE: %s [-h <hostname>] [-p <port>] [-r <rate>] [-t <tag>] [-v] -f <postalcodes.txt>\n" % os.path.basename(sys.argv[0]))
 
 
 def parse_args():
     try:
-        options, args = getopt(sys.argv[1:], "h:p:r:t:f:", ["hostname=", "port=", "rate=", "tag=", "file="])
+        options, args = getopt(sys.argv[1:], "h:p:r:t:vf:", ["hostname=", "port=", "rate=", "tag=", "verbose", "file="])
     except GetoptError, e:
         sys.stderr.write("error: %s\n" % e)
         print_usage()
@@ -53,6 +53,7 @@ def parse_args():
     port = 15001
     rate = 4  # ...per second
     tag = "PID%d" % os.getpid()
+    verbose = False
     ifile = None
         
     for option, value in options:
@@ -64,6 +65,8 @@ def parse_args():
             rate = float(value)
         elif option in ("-t", "--tag"):
             tag = value
+        elif option in ("-v", "--verbose"):
+            verbose = True
         elif option in ("-f", "--file"):
             ifile = value
    
@@ -76,11 +79,11 @@ def parse_args():
         print_usage()
         sys.exit(1)
 
-    return (hostname, port, rate, tag, ifile)
+    return (hostname, port, rate, tag, verbose, ifile)
 
 
 if __name__ == "__main__":
-    (hostname, port, rate, tag, ifile) = parse_args()
+    (hostname, port, rate, tag, verbose, ifile) = parse_args()
 
     f = open(ifile, "r")
 
@@ -99,7 +102,12 @@ if __name__ == "__main__":
         # In a real client we don't want it to terminate if the graphical application
         # can't be reached. We want it to keep running and recover automatically.
         try:
-            udp.sendto("%s,%s" % (random.choice(codes), tag), address)
+            message = "%s,%s" % (random.choice(codes), tag)
+            udp.sendto(message, address)
+
+            if verbose:
+                sys.stdout.write(message + "\n")
+
         except socket.error:
             pass
 
