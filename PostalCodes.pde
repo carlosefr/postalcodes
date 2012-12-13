@@ -181,7 +181,7 @@ void draw() {
   pushMatrix();
   noStroke();
   translate(width - 30, height - 30);
-  rotate(frameCount/TARGET_FRAMERATE * QUARTER_PI);
+  rotate(millis()/1500.0);
 
   fill(beatColors[0]);
   ellipse(-BEAT_RADIUS, -BEAT_RADIUS, BEAT_RADIUS*2, BEAT_RADIUS*2);
