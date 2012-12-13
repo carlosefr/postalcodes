@@ -50,7 +50,7 @@ public class PlaceMarkers {
   }
   
   public synchronized void clean() {
-    Iterator<PlaceMarker> iterator = markers.iterator();
+    Iterator<PlaceMarker> iterator = this.markers.iterator();
 
     // Remove dead markers...
     while (iterator.hasNext()) {
@@ -69,7 +69,7 @@ public class PlaceMarkers {
     this.counters.clear();
     this.statics = 0;
 
-    Iterator<PlaceMarker> iterator = markers.iterator();
+    Iterator<PlaceMarker> iterator = this.markers.iterator();
 
     while (iterator.hasNext()) {
       PlaceMarker marker = iterator.next();
