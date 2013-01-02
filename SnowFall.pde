@@ -28,15 +28,11 @@ public class SnowFall {
   private int maxFlakes;
   
   private float skyWidth;
-  private float maxRadius;
   
   public SnowFall(float density) {
     this.flakes = new LinkedList<SnowFlake>();
     this.skyWidth = width * 1.2;
     this.maxFlakes = round(this.skyWidth * density);
-    
-    // The snow flakes won't be bigger than this...
-    this.maxRadius = width / 60.0;
   }
   
   public void clean() {
@@ -68,10 +64,7 @@ public class SnowFall {
     
     // Create some new flakes...
     for (int i = 0; i < int(random(this.maxFlakes)) - this.flakes.size(); i++) {
-      int position = round(random(this.skyWidth));
-      float radius = lerp(0.25, 1.0, noise(position, frameCount)) * this.maxRadius;
-      
-      this.flakes.add(new SnowFlake(position, radius));
+      this.flakes.add(new SnowFlake(round(random(this.skyWidth))));
     }
   }
   
