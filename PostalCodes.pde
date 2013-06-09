@@ -116,8 +116,13 @@ void setup() {
   countColor = colors.get("COUNT_COLOR");
 
   eventFont = loadFont("Verdana-Bold-18.vlw");
-  countFont = loadFont("Arial-Black-144.vlw");
   labelFont = loadFont("Verdana-17.vlw");
+  
+  /*
+   * Processing 2.0 has a bug causing this font to appear corrupted if loaded from a file,
+   * so it must be created on demand. This requires the font to be installed in the system...
+   */
+  countFont = createFont("Arial-Black", 144, true, "0123456789".toCharArray());  // loadFont("Arial-Black-144.vlw");
 
   markers = new PlaceMarkers();
 
