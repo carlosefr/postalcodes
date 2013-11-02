@@ -26,7 +26,11 @@
 import java.util.*;
 import java.net.*;
 
-import hypermedia.net.*;
+/*
+ * The "UDP" processing library can be downloaded directly from
+ * the author's website at: http://ubaa.net/shared/processing/udp/
+ */
+import hypermedia.net.UDP;
 
 
 final String PROGRAM_NAME = "PostalCodes P2.0";
@@ -34,21 +38,8 @@ final String PROGRAM_NAME = "PostalCodes P2.0";
 final short TARGET_FRAMERATE = 30;
 final short SERVER_PORT = 15001;
 
-// The three portuguese regions...
-final short REGION_PT = 0;
-final short REGION_AZ = 1;
-final short REGION_MA = 2;
-
-// Ratios for each region ("horizontal/vertical")...
-final float RATIO_PT = 0.4687;
-final float RATIO_AC = 2.2222;
-final float RATIO_MA = 1.7252;
-
-// "Heartbeat"...
-final short BEAT_RADIUS = 4;
-
 // Easter-egg parameters...
-final short EGG_TRIGGER = 1143;
+final short EGG_TRIGGER = 1143;   // Treaty of Zamora
 final short EGG_DURATION = 5000;  // milliseconds
 
 // How much snow to have...
@@ -80,7 +71,7 @@ PImage egg;
 float eggStart = -1;
 
 // Debugging info...
-Boolean showInfo = false;
+Boolean showInfoBox = false;
 String ipAddress;
 
 
@@ -100,13 +91,14 @@ void setup() {
     noCursor();
   }
   
-  bounds = regionBounds(50);
-  codes = Collections.unmodifiableMap(loadPostalCodes("postalcodes.txt", bounds));
+  // Load the postal codes database as screen (pixel) coordinates...
+  bounds = calculateRegionBounds(50);
+  codes = Collections.unmodifiableMap(loadPostalCodesDB("postalcodes.txt", bounds));
   logfile = createWriter("postalcodes.log");
   
   // These two external resources define the overall look of the application...
   artwork = loadImage(String.format("background-%dx%d.png", width, height));
-  colors = loadColors("colors.properties");
+  colors = loadColorSettings("colors.properties");
 
   // Save the colors to avoid a "get" on each draw...
   beatColors = new color[2];
@@ -158,42 +150,14 @@ void draw() {
   // On the Mac this is *much* faster than using background()...
   image(artwork, 0, 0);
 
-  // Remove the expired markers...
+  // Make sure expired markers aren't drawn...
   markers.clean();
 
-  // The counter of events currently displayed...
-  fill(countColor);
-  textAlign(LEFT);
-
-  // The actual number of events...
-  textFont(countFont);
-  float baseline = height/2 + textAscent()/2;
-  text(markers.count(), 50, baseline);
+  // The number of events currently on the map...
+  drawEventCounter();
   
-  // The time span the counter refers to...
-  int minutes = millis() / 60000;
-  String label = (minutes < 60) ? String.format("nos últimos %d minutos", minutes) : "na última hora";
-  textFont(labelFont);
-  text(label, 60, baseline + textAscent() + 15);
-  
-  // The last event...
-  fill(eventColor);
-  textAlign(RIGHT);
-  textFont(eventFont);
-  text(lastEvent, width - 60, height - 30 + textAscent()/2);
-  
-  // Two rotating circles ("heartbeat")...
-  pushMatrix();
-  noStroke();
-  translate(width - 30, height - 30);
-  rotate(millis()/1500.0);
-
-  fill(beatColors[0]);
-  ellipse(-BEAT_RADIUS, -BEAT_RADIUS, BEAT_RADIUS*2, BEAT_RADIUS*2);
-
-  fill(beatColors[1]);
-  ellipse(BEAT_RADIUS, BEAT_RADIUS, BEAT_RADIUS*2, BEAT_RADIUS*2);
-  popMatrix();
+  // The last event location and "heartbeat" indicator...
+  drawStatusLine();
 
   // A small easter-egg: show a picture upon a particular counter value...
   if (markers.count() == EGG_TRIGGER) {
@@ -205,7 +169,7 @@ void draw() {
     image(egg, 0, height - egg.height);
   }
 
-  // Update the markers (do this last to always be on top)...
+  // Place the markers on the map...
   markers.draw();
 
   if (snow != null) {
@@ -215,103 +179,118 @@ void draw() {
   }
   
   // Show some information (on top of everything)...
-  if (showInfo) {
-    drawInfo();
+  if (showInfoBox) {
+    drawInfoBox();
   }
 }
 
 
-int[][] regionBounds(int margin) {
-  int[][] bounds = new int[regions.length][4];
+void drawEventCounter() {
+  fill(countColor);
+  textAlign(LEFT);
+
+  // The actual number of events (currently displayed)...
+  textFont(countFont);
+  float baseline = height/2 + textAscent()/2;
+  text(markers.count(), 50, baseline);
   
-  // Boundaries for Mainland Portugal...
-  bounds[REGION_PT][0] = width - margin - round((height - 2*margin) * RATIO_PT);
-  bounds[REGION_PT][1] = margin;
-  bounds[REGION_PT][2] = width - margin;
-  bounds[REGION_PT][3] = height - margin;
-
-  // Base value for the spacing between regions (1/10 the height of mainland Portugal)
-  int spacing = round((bounds[REGION_PT][3]-bounds[REGION_PT][1])/10);
-
-  // Boundaries for the (inhabited) Madeira islands...
-  bounds[REGION_MA][0] = bounds[REGION_PT][0] - spacing - round((bounds[REGION_PT][3]-bounds[REGION_PT][1])/5 * RATIO_MA);
-  bounds[REGION_MA][1] = bounds[REGION_PT][3] - spacing - round((bounds[REGION_PT][3]-bounds[REGION_PT][1])/5);
-  bounds[REGION_MA][2] = bounds[REGION_PT][0] - spacing;
-  bounds[REGION_MA][3] = bounds[REGION_PT][3] - spacing;
-
-  // Boundaries for the Azores islands...
-  bounds[REGION_AZ][0] = bounds[REGION_MA][2] - spacing - round((bounds[REGION_PT][3]-bounds[REGION_PT][1])/4 * RATIO_AC);
-  bounds[REGION_AZ][1] = bounds[REGION_MA][1] - spacing - round((bounds[REGION_PT][3]-bounds[REGION_PT][1])/4);
-  bounds[REGION_AZ][2] = bounds[REGION_MA][2] - spacing;
-  bounds[REGION_AZ][3] = bounds[REGION_MA][1] - spacing;
-
-  return bounds;
+  // The time span the counter refers to...
+  int minutes = millis() / 60000;
+  String label = (minutes < 60) ? String.format("nos últimos %d minutos", minutes) : "na última hora";
+  textFont(labelFont);
+  text(label, 60, baseline + textAscent() + 15);
 }
 
 
-Map<String,PostalCode> loadPostalCodes(String filename, int[][] bounds) {
-  Map<String,PostalCode> codes = new HashMap<String,PostalCode>();
-  BufferedReader reader = null;
-  
-  // The file is assumed to have been correctly generated by the "makedb.py" script...
-  try {
-    String data;
-    
-    reader = createReader(filename);
-    
-    while ((data = reader.readLine()) != null) {
-      String[] fields = split(data, '|');
-      
-      int region = int(fields[2]);
-      
-      // Convert the [0,1] ranged locations to screen coordinates...
-      int x = round(lerp(bounds[region][0], bounds[region][2], float(fields[3])));
-      int y = round(lerp(bounds[region][1], bounds[region][3], float(fields[4])));
-      
-      PostalCode place = new PostalCode(fields[0], fields[1], region, x, y);
-      
-      codes.put(place.code, place);
-    }
-  } catch (IOException e) {
-    e.printStackTrace();
+void drawStatusLine() {
+  // The last event placed on the map...
+  fill(eventColor);
+  textAlign(RIGHT);
+  textFont(eventFont);
+  text(lastEvent, width - 60, height - 30 + textAscent()/2);
 
-    return null;
-  } finally {
-    try {
-      if (reader != null) {
-        reader.close();
-      }
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
+  // The "heartbeat" indicator (two rotating circles)...
+  pushMatrix();
+  
+  noStroke();
+  translate(width - 30, height - 30);
+  rotate(millis()/1500.0);
+
+  fill(beatColors[0]);
+  ellipse(-4, -4, 8, 8);
+
+  fill(beatColors[1]);
+  ellipse(4, 4, 8, 8);
+
+  popMatrix();
+}
+
+
+void drawInfoBox() {
+    String info = String.format("%s\nJava %s (%s)\n%dx%d@%dfps (%s)\n%s\n%s:%d/UDP",
+                                PROGRAM_NAME,
+                                System.getProperty("java.runtime.version"), System.getProperty("os.arch"),
+                                width, height, round(frameRate), g.getClass().getName(),
+                                glRendererEnabled() ? glGetInfo() : "GL info not available",
+                                ipAddress, SERVER_PORT);
+    
+    pushStyle();
+    textFont(labelFont);
+    
+    // Define an integer line height, to avoid blurring...
+    int lineHeight = round(textAscent() + textDescent() + 6.0);
+    
+    // Set the leading to accurately know the line height...
+    textLeading(lineHeight);
+    int infoHeight = lineHeight * split(info, "\n").length;
+    
+    pushMatrix();
+    translate(30, height - 30 - infoHeight);
+    
+    noStroke();
+    
+    fill(#ffffff);
+    rectMode(CORNERS);
+    rect(-15, -15, textWidth(info) + 15, infoHeight + 15);
+    
+    fill(#000000);
+    textAlign(LEFT, BOTTOM);
+    text(info, 0, infoHeight);
+    
+    popMatrix();
+    popStyle();
+}
+
+
+void keyReleased() {
+  // Save a snapshot...
+  if (key == 'c') {
+    saveFrame("PostalCodes-" + frameCount + ".png");
   }
   
-  return codes;
-}
-
-
-Map<String,Integer> loadColors(String filename) {
-  Map<String,Integer> colors = new HashMap<String,Integer>();
-  Properties props = new Properties();
-
-  try {
-    props.load(createReader(filename));
-  } catch (IOException e) {
-    e.printStackTrace();
-    
-    return null;
+  // Show/hide info...
+  if (key == 'i') {
+    showInfoBox = !showInfoBox;
   }
   
-  colors.put("EVENT_COLOR", unhex(props.getProperty("event_text", "000000")) | 0xff000000);
-  colors.put("COUNT_COLOR", unhex(props.getProperty("count_text", "000000")) | 0xff000000);
-  colors.put("INNER_COLOR", unhex(props.getProperty("inner_marker", "d72f28")) | 0xff000000);
-  colors.put("OUTER_COLOR", unhex(props.getProperty("outer_marker", "379566")) | 0xff000000);
-  colors.put("PLACE_COLOR", unhex(props.getProperty("place_marker", "000000")) | 0xff000000);
+  // Toggle snowfall...
+  if (key == 's') {
+    snow = (snow == null ? new SnowFall(SNOW_DENSITY) : null);
+  }
   
-  return colors;
+  if (key == 't') {
+    /*
+     * If a suitable background image does not exist, we have to generate one with
+     * the three region's boundaries clearly marked to be used as a template...
+     */
+     saveArtworkTemplate(String.format("template-%dx%d.png", width, height), codes, bounds);
+  }
 }
 
 
+/*
+ * This function is called implicitly for every UDP packet received...
+ */
 void receive(byte[] data, String ip, int port) {
   String message = new String(data);
   
@@ -366,7 +345,29 @@ void receive(byte[] data, String ip, int port) {
 }
 
 
-void saveFrameTemplate(String filename, Map<String,PostalCode> codes, int[][] bounds) {
+Map<String,Integer> loadColorSettings(String filename) {
+  Map<String,Integer> colors = new HashMap<String,Integer>();
+  Properties props = new Properties();
+
+  try {
+    props.load(createReader(filename));
+  } catch (IOException e) {
+    e.printStackTrace();
+    
+    return null;
+  }
+  
+  colors.put("EVENT_COLOR", unhex(props.getProperty("event_text", "000000")) | 0xff000000);
+  colors.put("COUNT_COLOR", unhex(props.getProperty("count_text", "000000")) | 0xff000000);
+  colors.put("INNER_COLOR", unhex(props.getProperty("inner_marker", "d72f28")) | 0xff000000);
+  colors.put("OUTER_COLOR", unhex(props.getProperty("outer_marker", "379566")) | 0xff000000);
+  colors.put("PLACE_COLOR", unhex(props.getProperty("place_marker", "000000")) | 0xff000000);
+  
+  return colors;
+}
+
+
+void saveArtworkTemplate(String filename, Map<String,PostalCode> codes, int[][] bounds) {
   PGraphics pg = createGraphics(width, height, JAVA2D);
   
   pg.beginDraw();
@@ -394,68 +395,6 @@ void saveFrameTemplate(String filename, Map<String,PostalCode> codes, int[][] bo
 
   pg.endDraw();  
   pg.save(filename);
-}
-
-
-void drawInfo() {
-    String info = String.format("%s\nJava %s (%s)\n%dx%d@%dfps (%s)\n%s\n%s:%d/UDP",
-                                PROGRAM_NAME,
-                                System.getProperty("java.runtime.version"), System.getProperty("os.arch"),
-                                width, height, round(frameRate), g.getClass().getName(),
-                                glRendererEnabled() ? glGetInfo() : "GL info not available",
-                                ipAddress, SERVER_PORT);
-    
-    pushStyle();
-    textFont(labelFont);
-    
-    // Define an integer line height, to avoid blurring...
-    int lineHeight = round(textAscent() + textDescent() + 6.0);
-    
-    // Set the leading to accurately know the line height...
-    textLeading(lineHeight);
-    int infoHeight = lineHeight * split(info, "\n").length;
-    
-    pushMatrix();
-    translate(30, height - 30 - infoHeight);
-    
-    noStroke();
-    
-    fill(#ffffff);
-    rectMode(CORNERS);
-    rect(-15, -15, textWidth(info) + 15, infoHeight + 15);
-    
-    fill(#000000);
-    textAlign(LEFT, BOTTOM);
-    text(info, 0, infoHeight);
-    
-    popMatrix();
-    popStyle();
-}
-
-
-void keyReleased() {
-  // Save a snapshot...
-  if (key == 'c') {
-    saveFrame("PostalCodes-" + frameCount + ".png");
-  }
-  
-  // Show/hide info...
-  if (key == 'i') {
-    showInfo = !showInfo;
-  }
-  
-  // Toggle snowfall...
-  if (key == 's') {
-    snow = (snow == null ? new SnowFall(SNOW_DENSITY) : null);
-  }
-  
-  if (key == 't') {
-    /*
-     * If a suitable background image does not exist, we have to generate one with
-     * the three region's boundaries clearly marked to be used as a template...
-     */
-     saveFrameTemplate(String.format("template-%dx%d.png", width, height), codes, bounds);
-  }
 }
 
 
