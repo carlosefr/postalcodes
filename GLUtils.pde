@@ -34,13 +34,13 @@ void glSetSmooth(boolean enabled) {
 
 
 void glSetSync(boolean enabled) {
-  g.beginPGL().gl.setSwapInterval(enabled ? 1 : 0);
+  ((PJOGL)g.beginPGL()).gl.setSwapInterval(enabled ? 1 : 0);
   g.endPGL();
 }
 
 
 String glGetInfo() {
-  javax.media.opengl.GL gl = g.beginPGL().gl;
+  javax.media.opengl.GL gl = ((PJOGL)g.beginPGL()).gl;
   String info = String.format("%s, %s, OpenGL %s", gl.glGetString(gl.GL_VENDOR),
                                                    gl.glGetString(gl.GL_RENDERER),
                                                    gl.glGetString(gl.GL_VERSION));
