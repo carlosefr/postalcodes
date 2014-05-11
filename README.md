@@ -1,9 +1,9 @@
 What is it?
 ===========
 
-_Postal Codes_ is an application to show activity on a map based on postal code coordinates. It is designed for [Portugal](http://en.wikipedia.org/wiki/Portugal) specifically, but you can use it as a starting point to tailor it to another country if you wish. The code is [free](http://www.opensource.org/licenses/mit-license.php) after all.
+**Postal Codes** is an application to show activity on a map based on postal code coordinates. It is designed for [Portugal](http://en.wikipedia.org/wiki/Portugal) specifically, but you can use it as a starting point to tailor it to another country if you wish. The code is [free](http://www.opensource.org/licenses/mit-license.php) after all.
 
-Below you can see how it looks like in its default configuration (to fit standard widescreen TVs). However, the appearance can be easily customized to fit your own branding just by replacing/modifying the background image and changing a couple of colors in a properties file.
+Below you can see how it looks like in its default configuration (to fit standard widescreen TVs). However, the appearance can be easily [customized](https://github.com/carlosefr/postalcodes/wiki/Customizing) to fit your own branding just by replacing/modifying the background image and changing a couple of colors in a properties file.
 
 ![screenshot](http://www.carlos-rodrigues.com/projects/postalcodes/postalcodes.jpg)
 [[video](http://www.youtube.com/watch?v=0PTb9AgNhrE)]
@@ -23,6 +23,6 @@ What does it need to run?
 
 Older versions of any of these packages may work, but haven't been tested. Newer versions should also work, and you should use them if possible. If you notice any problems, please file an issue report and I'll try to fix them.
 
-_Postal Codes_ has been tested on Windows 7 and Mac OS X 10.8, but it should work wherever Processing works.
+**Postal Codes** has been tested on Windows 7 and Mac OS X 10.8, but it should work wherever Processing works.
 
 By default it uses OpenGL for rendering, so you should have a graphics card with support for OpenGL. These days almost any card should work, but if you happen to have one that doesn't, the renderer can be changed to Java2D (in the main [`setup()`](PostalCodes.pde#L79) function), which will result in a bigger CPU usage, but that's all.
