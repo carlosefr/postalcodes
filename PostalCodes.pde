@@ -77,6 +77,7 @@ String ipAddress;
 
 void setup() {
   size(1280, 768, P3D);
+  //pixelDensity(displayDensity());  // FIXME: Snow is broken on Retina.
   frameRate(TARGET_FRAMERATE);
   smooth();
   

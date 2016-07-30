@@ -109,7 +109,12 @@ public class SnowFlake {
       return;
     }
     
-    // Just place the cached flake on screen...
+    //noFill();
+    //stroke(#ff0000);
+    //rect(this.x - this.flake.width/2.0, this.y - this.flake.height/2.0, this.flake.width, this.flake.height);
+
+    // Place the cached flake on screen with a slight transparency...
+    tint(255, 224);
     image(this.flake, this.x - this.flake.width/2.0, this.y - this.flake.height/2.0);
   }
 }
