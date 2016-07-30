@@ -147,8 +147,10 @@ void draw() {
     return;
   }
   
-  // On the Mac this is *much* faster than using background()...
-  image(artwork, 0, 0);
+  // On the Mac image() is *much* faster than background(), but exhibits
+  // some random strange behavior in Processing 3.1. This is unfortunate,
+  // because background() puts retina performance below acceptable levels...
+  background(artwork);
 
   // Make sure expired markers aren't drawn...
   markers.clean();
