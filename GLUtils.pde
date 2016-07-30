@@ -23,6 +23,9 @@
  */
 
 
+import com.jogamp.opengl.*;
+
+
 boolean glRendererEnabled() {
   return g.getClass().getName().contains("PGraphics3D");
 }
@@ -40,10 +43,10 @@ void glSetSync(boolean enabled) {
 
 
 String glGetInfo() {
-  javax.media.opengl.GL gl = ((PJOGL)g.beginPGL()).gl;
-  String info = String.format("%s, %s, OpenGL %s", gl.glGetString(gl.GL_VENDOR),
-                                                   gl.glGetString(gl.GL_RENDERER),
-                                                   gl.glGetString(gl.GL_VERSION));
+  GL gl = ((PJOGL)g.beginPGL()).gl;
+  String info = String.format("%s, %s, OpenGL %s", gl.glGetString(GL.GL_VENDOR),
+                                                   gl.glGetString(GL.GL_RENDERER),
+                                                   gl.glGetString(GL.GL_VERSION));
   g.endPGL();
   
   return info;
