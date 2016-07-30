@@ -172,13 +172,14 @@ public class PlaceMarker {
       
       pg.beginDraw();
       pg.smooth();
-      this.drawMarkerJava2D(STATIC_RADIUS, STATIC_OPACITY, pg, pg.width/2.0, pg.height/2.0);
+      this.drawMarkerJava2D(STATIC_RADIUS, 255, pg, pg.width/2.0, pg.height/2.0);
       pg.endDraw();
       
       marker = (PImage)pg;
     }
 
-    // Just place the cached marker on screen...
+    // Place the cached marker on screen with transparency...
+    tint(255, STATIC_OPACITY);
     image(marker, this.x - marker.width/2.0, this.y - marker.height/2.0);
   }  
 }
