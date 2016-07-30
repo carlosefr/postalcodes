@@ -5,7 +5,7 @@ What is it?
 
 Below you can see how it looks like in its default configuration (to fit standard widescreen TVs). However, the appearance can be easily [customized](https://github.com/carlosefr/postalcodes/wiki/Customizing) to fit your own branding just by replacing/modifying the background image and changing a couple of colors in a properties file.
 
-![screenshot](http://cloud.carlos-rodrigues.com/projects/postalcodes/postalcodes.jpg)
+![screenshot](https://raw.githubusercontent.com/carlosefr/postalcodes/master/screenshots/postalcodes.jpg)
 [[video](http://www.youtube.com/watch?v=0PTb9AgNhrE)]
 
 It works as a client-server application where the graphical portion listens on the network and one or more client agents on another (or the same) machine sends it postal codes to map on screen. The protocol is based on UDP and is very simple, so custom client agents are easy to make in whatever language you choose.
