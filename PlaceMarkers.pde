@@ -31,7 +31,7 @@ public class PlaceMarkers {
   private List<PlaceMarker> markers;
   private Map<String,Integer> counters;
   private int statics;
-  
+
   public PlaceMarkers() {
     this.markers = new LinkedList<PlaceMarker>();
     this.counters = new HashMap<String,Integer>();
@@ -40,7 +40,7 @@ public class PlaceMarkers {
   public synchronized int count() {
     return this.markers.size();
   }
-  
+
   public synchronized int exploding() {
     return this.markers.size() - this.statics;
   }
@@ -48,7 +48,7 @@ public class PlaceMarkers {
   public synchronized void add(int x, int y, String place) {
     this.markers.add(new PlaceMarker(x, y, place));
   }
-  
+
   public synchronized void clean() {
     Iterator<PlaceMarker> iterator = this.markers.iterator();
 
@@ -64,7 +64,7 @@ public class PlaceMarkers {
       iterator.remove();
     }
   }
-  
+
   public synchronized void draw() {
     this.counters.clear();
     this.statics = 0;
@@ -73,20 +73,20 @@ public class PlaceMarkers {
 
     while (iterator.hasNext()) {
       PlaceMarker marker = iterator.next();
-      
+
       // Limit the number of static markers at the same location...
       if (!marker.exploding()) {
         String key = String.format("%d,%d", marker.x, marker.y);
         int count = this.counters.containsKey(key) ? this.counters.get(key) : 0;
-        
+
         this.counters.put(key, count + 1);
         this.statics++;
-        
+
         if (count >= MAX_STATIC_MARKERS) {
           continue;
         }
       }
-      
+
       marker.draw();
     }
   }

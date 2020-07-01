@@ -43,7 +43,7 @@ final String[] regions = { "PT", "AZ", "MA" };
  */
 int[][] calculateRegionBounds(int margin) {
   int[][] bounds = new int[regions.length][4];
-  
+
   // Boundaries for Mainland Portugal...
   bounds[REGION_PT][0] = width - margin - round((height - 2*margin) * RATIO_PT);
   bounds[REGION_PT][1] = margin;

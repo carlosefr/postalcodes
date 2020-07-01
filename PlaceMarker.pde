@@ -46,17 +46,17 @@ public class PlaceMarker {
   private color innerColor;
   private color outerColor;
   private color placeColor;
-  
+
   public int x;
   public int y;
   public String place;
-  
+
   public PlaceMarker(int x, int y, String place) {
     this.start = millis();
     this.x = x;
     this.y = y;
     this.place = place;
-    
+
     // Get the colors from the global properties...
     this.innerColor = colors.get("INNER_COLOR");
     this.outerColor = colors.get("OUTER_COLOR");
@@ -74,7 +74,7 @@ public class PlaceMarker {
   public boolean exploding() {
     return millis() < this.start + DURATION;
   }
-  
+
   public boolean finished() {
     return millis() - this.start > REMAIN;
   }
@@ -93,29 +93,29 @@ public class PlaceMarker {
 
     // Inner circle...
     fill(this.innerColor, opacity);
-    
+
     beginShape(TRIANGLE_FAN);
     vertex(0, 0);
-    
+
     for (int i = 0; i <= res; i++) {
       float angle = (TWO_PI / res) * i;
       vertex(radius * cos(angle), radius * sin(angle));
     }
     endShape();
 
-    // Outer circle...        
+    // Outer circle...
     fill(this.outerColor, opacity);
 
     float outerStroke = radius/1.5;
     float outerRadius = radius*2;
-    
+
     beginShape(TRIANGLE_STRIP);
     for (int i = 0; i <= res + 1; i++) {
       float angle = (TWO_PI / res) * i;
       float r = (i % 2 == 0 ? 1 : -1) * (outerStroke/2.0) + outerRadius;
-      
+
       vertex(r*cos(angle), r*sin(angle));
-    }      
+    }
     endShape();
 
     popStyle();
@@ -131,7 +131,7 @@ public class PlaceMarker {
     pg.ellipse(x, y, radius*2, radius*2);
 
     // Outer circle...
-    pg.noFill();      
+    pg.noFill();
     pg.stroke(this.outerColor, opacity);
     pg.strokeWeight(radius/1.5);
     pg.ellipse(x, y, radius*4, radius*4);
@@ -141,16 +141,16 @@ public class PlaceMarker {
 
   private void explode() {
     int elapsed = millis() - this.start;
-        
+
     float opacity = elapsed <= DURATION - FADE ? 255 : map(DURATION - elapsed, FADE, 0, 255, 0);
     float radius = map(sqrt(2*elapsed*DURATION - sq(elapsed)), 0, DURATION, 0, MAX_RADIUS);
-    
+
     if (glRendererEnabled()) {
       this.drawMarkerOpenGL(radius, opacity);
     } else {
       // The Java2D method can also render on an image, but not here...
       this.drawMarkerJava2D(radius, opacity, g, this.x, this.y);
-    }    
+    }
 
     pushStyle();
 
@@ -161,7 +161,7 @@ public class PlaceMarker {
 
     popStyle();
   }
-  
+
   private void stay() {
     // The static marker is only drawn once, and then cached...
     if (marker == null) {
@@ -169,19 +169,19 @@ public class PlaceMarker {
       int sz = 2 * ceil((STATIC_RADIUS/1.5)/2.0 + STATIC_RADIUS*2.0);
 
       PGraphics pg = createGraphics(sz, sz, JAVA2D);
-      
+
       pg.beginDraw();
       pg.smooth();
       this.drawMarkerJava2D(STATIC_RADIUS, 255, pg, pg.width/2.0, pg.height/2.0);
       pg.endDraw();
-      
+
       marker = (PImage)pg;
     }
 
     // Place the cached marker on screen with transparency...
     tint(255, STATIC_OPACITY);
     image(marker, this.x - marker.width/2.0, this.y - marker.height/2.0);
-  }  
+  }
 }
 
 

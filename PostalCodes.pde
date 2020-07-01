@@ -117,7 +117,7 @@ void setup() {
 
   eventFont = loadFont("Verdana-Bold-18.vlw");
   labelFont = loadFont("Verdana-17.vlw");
-  
+
   /*
    * Processing 2.0 has a bug causing this font to appear corrupted if loaded from a file,
    * so it must be created on demand. This requires the font to be installed in the system...
@@ -164,7 +164,7 @@ void draw() {
 
   // The number of events currently on the map...
   drawEventCounter();
-  
+
   // The last event location and "heartbeat" indicator...
   drawStatusLine();
 
@@ -172,7 +172,7 @@ void draw() {
   if (markers.count() == EGG_TRIGGER) {
     eggStart = millis();
   }
-  
+
   // Show the easter-egg for a few seconds after the fact...
   if (eggStart > 0 && millis() < eggStart + EGG_DURATION) {
     image(egg, 0, height - egg.height);
@@ -186,7 +186,7 @@ void draw() {
     snow.update();
     snow.draw();
   }
-  
+
   // Show some information (on top of everything)...
   if (showInfoBox) {
     drawInfoBox();
@@ -204,7 +204,7 @@ void drawEventCounter() {
   textFont(countFont);
   float baseline = height/2 + textAscent()/2;
   text(markers.count(), 50, baseline);
-  
+
   // The time span the counter refers to...
   int minutes = millis() / 60000;
   String label = (minutes < 60) ? String.format("nos últimos %d minutos", minutes) : "na última hora";
@@ -222,7 +222,7 @@ void drawStatusLine() {
 
   // The "heartbeat" indicator (two rotating circles)...
   pushMatrix();
-  
+
   noStroke();
   translate(width - 30, height - 30);
   rotate(millis()/1500.0);
@@ -244,30 +244,30 @@ void drawInfoBox() {
                                 width, height, round(frameRate), g.getClass().getName(),
                                 glRendererEnabled() ? glGetInfo() : "GL info not available",
                                 ipAddress, SERVER_PORT);
-    
+
     pushStyle();
     textFont(labelFont);
-    
+
     // Define an integer line height, to avoid blurring...
     int lineHeight = round(textAscent() + textDescent() + 6.0);
-    
+
     // Set the leading to accurately know the line height...
     textLeading(lineHeight);
     int infoHeight = lineHeight * split(info, "\n").length;
-    
+
     pushMatrix();
     translate(30, height - 30 - infoHeight);
-    
+
     noStroke();
-    
+
     fill(#ffffff);
     rectMode(CORNERS);
     rect(-15, -15, textWidth(info) + 15, infoHeight + 15);
-    
+
     fill(#000000);
     textAlign(LEFT, BOTTOM);
     text(info, 0, infoHeight);
-    
+
     popMatrix();
     popStyle();
 }
@@ -278,18 +278,18 @@ void keyReleased() {
   if (key == 'c') {
     saveFrame("PostalCodes-" + frameCount + ".png");
   }
-  
+
   // Show/hide info...
   if (key == 'i') {
     showInfoBox = !showInfoBox;
   }
-  
+
   // Toggle snowfall...
   if (key == 's') {
     snow = (snow == null ? new SnowFall(SNOW_DENSITY) : null);
     artwork = loadImage(String.format("background-%s%dx%d.png", snow == null ? "": "snow-", width, height));
   }
-  
+
   if (key == 't') {
     /*
      * If a suitable background image does not exist, we have to generate one with
@@ -305,12 +305,12 @@ void keyReleased() {
  */
 void receive(byte[] data, String ip, int port) {
   String message = new String(data);
-  
+
   int h = hour();
   int m = minute();
-  
+
   String label = String.format("%d-%02d-%02d %02d:%02d:%02d [%s:%d]", year(), month(), day(), h, m, second(), ip, port);
-  
+
   /*
    * The event is made up of two comma-separated parts:
    *
@@ -320,25 +320,25 @@ void receive(byte[] data, String ip, int port) {
   if (!message.matches("^\\d{4}-\\d{3}(,\\w{1,16})?$")) {
     logfile.println(label + ": invalid data");
     logfile.flush();
-    
+
     return;
   }
-  
+
   String[] parts = split(message, ",");
 
-  // Extend the logging label with the agent tag...  
+  // Extend the logging label with the agent tag...
   label += (parts.length > 1) ? String.format(" [%s]", parts[1]) : " []";
 
   // Obtain the postal code data...
   PostalCode code = codes.get(parts[0]);
-  
+
   if (code == null) {  // Try the simplified code...
     code = codes.get(split(parts[0], "-")[0] + "-000");
 
     if (code == null) {
       logfile.println(label + ": not found: " + parts[0]);
       logfile.flush();
-      
+
       return;
     }
 
@@ -349,9 +349,9 @@ void receive(byte[] data, String ip, int port) {
     logfile.println(label + ": found: " + code);
     logfile.flush();
   }
-  
+
   markers.add(code.x, code.y, code.place);
-    
+
   // Update the place of the most recent marker...
   lastEvent = String.format("%d:%02d - %s", h, m, code.place);
 }
@@ -365,32 +365,32 @@ Map<String,Integer> loadColorSettings(String filename) {
     props.load(createReader(filename));
   } catch (IOException e) {
     e.printStackTrace();
-    
+
     return null;
   }
-  
+
   colors.put("EVENT_COLOR", unhex(props.getProperty("event_text", "000000")) | 0xff000000);
   colors.put("COUNT_COLOR", unhex(props.getProperty("count_text", "000000")) | 0xff000000);
   colors.put("INNER_COLOR", unhex(props.getProperty("inner_marker", "d72f28")) | 0xff000000);
   colors.put("OUTER_COLOR", unhex(props.getProperty("outer_marker", "379566")) | 0xff000000);
   colors.put("PLACE_COLOR", unhex(props.getProperty("place_marker", "000000")) | 0xff000000);
-  
+
   return colors;
 }
 
 
 void saveArtworkTemplate(String filename, Map<String,PostalCode> codes, int[][] bounds) {
   PGraphics pg = createGraphics(width, height, JAVA2D);
-  
+
   pg.beginDraw();
   pg.smooth();
 
   // Start with what's on screen right now...
   pg.image(get(), 0, 0);
-  
+
   pg.fill(#fffd66, 128);
   pg.noStroke();
-  
+
   for (int i = 0; i < bounds.length; i++) {
     pg.rect(bounds[i][0], bounds[i][1], 1+bounds[i][2]-bounds[i][0], 1+bounds[i][3]-bounds[i][1]);
   }
@@ -405,7 +405,7 @@ void saveArtworkTemplate(String filename, Map<String,PostalCode> codes, int[][] 
     pg.ellipse(code.x, code.y, 2, 2);
   }
 
-  pg.endDraw();  
+  pg.endDraw();
   pg.save(filename);
 }
 

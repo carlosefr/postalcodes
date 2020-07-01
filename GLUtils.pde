@@ -48,7 +48,7 @@ String glGetInfo() {
                                                    gl.glGetString(GL.GL_RENDERER),
                                                    gl.glGetString(GL.GL_VERSION));
   g.endPGL();
-  
+
   return info;
 }
 

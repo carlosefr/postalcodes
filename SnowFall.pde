@@ -26,15 +26,15 @@
 public class SnowFall {
   private List<SnowFlake> flakes;
   private int maxFlakes;
-  
+
   private float skyWidth;
-  
+
   public SnowFall(float density) {
     this.flakes = new LinkedList<SnowFlake>();
     this.skyWidth = width * 1.2;
     this.maxFlakes = round(this.skyWidth * density);
   }
-  
+
   public void clean() {
     Iterator<SnowFlake> iterator = this.flakes.iterator();
 
@@ -46,28 +46,28 @@ public class SnowFall {
       }
     }
   }
-  
+
   public void update() {
     // Discard offscreen flakes...
     this.clean();
-    
+
     // Update the flakes' position...
     Iterator<SnowFlake> iterator = this.flakes.iterator();
-    
+
     while (iterator.hasNext()) {
       SnowFlake flake = iterator.next();
-      
+
       // Variable wind (always right to left)...
       flake.setWind((sin(frameCount * 0.01) - 1.0) * 0.5);
       flake.update();
     }
-    
+
     // Create some new flakes...
     for (int i = 0; i < int(random(this.maxFlakes)) - this.flakes.size(); i++) {
       this.flakes.add(new SnowFlake(round(random(this.skyWidth))));
     }
   }
-  
+
   public void draw() {
     Iterator<SnowFlake> iterator = this.flakes.iterator();
 
