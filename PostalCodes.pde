@@ -33,7 +33,7 @@ import java.net.*;
 import hypermedia.net.UDP;
 
 
-final String PROGRAM_NAME = "PostalCodes P2.0";
+final String PROGRAM_NAME = "PostalCodes P3.5";
 
 final short TARGET_FRAMERATE = 30;
 final short SERVER_PORT = 15001;
@@ -75,11 +75,14 @@ Boolean showInfoBox = false;
 String ipAddress;
 
 
-void setup() {
-  size(1280, 768, P3D);
-  //pixelDensity(displayDensity());  // FIXME: Snow is broken on Retina.
-  frameRate(TARGET_FRAMERATE);
+void settings() {
+  size(1280, 720, JAVA2D);
   smooth();
+}
+
+
+void setup() {
+  frameRate(TARGET_FRAMERATE);
   
   // Force v-sync and anti-aliasing when using OpenGL...
   if (glRendererEnabled()) {

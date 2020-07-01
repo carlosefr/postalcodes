@@ -17,12 +17,10 @@ What does it need to run?
 =========================
 
   * [Java](http://www.oracle.com/technetwork/java/) (either as a separate download or the version included with Processing)
-  * [Processing](http://processing.org/) Processing 2.1 (for the graphical application)
+  * [Processing](http://processing.org/) Processing 3.5 (for the graphical application)
   * [UDP](http://ubaa.net/shared/processing/udp/) sockets library for Processing
-  * [Python](http://python.org/ Python) 2.7.2 or newer (optional, for the example agent and database import script)
+  * [Python](http://python.org/Python) 2.7.2 or newer (optional, for the example agent and database import script)
 
-Older versions of any of these packages may work, but haven't been tested. Newer versions should also work, and you should use them if possible. If you notice any problems, please file an issue report and I'll try to fix them.
+Older versions of any of these packages may work, but haven't been tested. Newer versions should also work, and you should use them if possible.
 
-**Postal Codes** has been tested on Windows 7 and Mac OS X 10.8, but it should work wherever Processing works.
-
-By default it uses OpenGL for rendering, so you should have a graphics card with support for OpenGL. These days almost any card should work, but if you happen to have one that doesn't, the renderer can be changed to Java2D (in the main [`setup()`](PostalCodes.pde#L79) function), which will result in a bigger CPU usage, but that's all.
+**Postal Codes** has been tested on macOS 10.15, but it should work wherever Processing works.
