@@ -76,7 +76,7 @@ String ipAddress;
 
 
 void settings() {
-  size(1280, 720, JAVA2D);
+  size(1280, 720, P2D);
   smooth();
 }
 
