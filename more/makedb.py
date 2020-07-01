@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # makedb.py - download and convert GeoNames' postal codes database for Portugal.
@@ -25,20 +25,18 @@
 #
 
 
-from __future__ import division
-
-import os, os.path
+import os
 import sys
 
 from getopt import getopt, GetoptError
-from urllib2 import urlopen, Request
+from urllib.request import urlopen, Request
 from zipfile import ZipFile
 
 
 # Coordinate boundaries for each of the three portuguese regions...
-boundaries = { 0: (42.1541, -9.5091, 36.9624, -6.1885),     # Mainland Portugal
-               1: (39.7312, -31.2920, 36.9272, -25.0084),   # Azores islands
-               2: (33.1142, -17.2830, 32.6321, -16.2833) }  # Madeira islands (inhabited)
+boundaries = {0: (42.1541, -9.5091, 36.9624, -6.1885),    # Mainland Portugal
+              1: (39.7312, -31.2920, 36.9272, -25.0084),  # Azores islands
+              2: (33.1142, -17.2830, 32.6321, -16.2833)}  # Madeira islands (inhabited)
 
 
 def print_usage():
@@ -48,18 +46,18 @@ def print_usage():
 def parse_args():
     try:
         options, args = getopt(sys.argv[1:], "o:", ["output="])
-    except GetoptError, e:
+    except GetoptError as e:
         sys.stderr.write("error: %s\n" % e)
         print_usage()
         sys.exit(1)
 
     ofile = None
-        
+
     for option, value in options:
         if option in ("-o", "--output"):
             ofile = value
-    
-    if ofile == None:
+
+    if ofile is None:
         sys.stderr.write("error: parameter(s) missing\n")
         print_usage()
         sys.exit(1)
@@ -71,11 +69,10 @@ def find_region(latitude, longitude):
     for region in boundaries.keys():
         (max_lat, min_lon, min_lat, max_lon) = boundaries[region]
 
-        if (latitude < max_lat and latitude > min_lat and
-            longitude < max_lon and longitude > min_lon):
+        if min_lat < latitude < max_lat and min_lon < longitude < max_lon:
             return region
 
-    return None 
+    return None
 
 
 def normalize(value, stop, start):
@@ -93,13 +90,13 @@ def download(url):
         chunk = response.read(4096)
         if not chunk:
             break
-        
+
         f.write(chunk)
 
     f.close()
     response.close()
 
-    zfile = ZipFile(filename);
+    zfile = ZipFile(filename)
 
     f = open(datafile, "wb")
     f.write(zfile.read(datafile))
@@ -146,7 +143,7 @@ def process(ifile, ofile, efile):
     output = set()
     plain_codes = set()
 
-    for code in sorted(codes.iterkeys()):
+    for code in sorted(codes.keys()):
         place, lat, lon = codes[code]
         region = find_region(lat, lon)
 
@@ -155,7 +152,7 @@ def process(ifile, ofile, efile):
             continue
 
         # Normalize and remap the coodinates to a [0,1] range...
-        x = normalize(lon, boundaries[region][3], boundaries[region][1]) 
+        x = normalize(lon, boundaries[region][3], boundaries[region][1])
         y = normalize(lat, boundaries[region][2], boundaries[region][0])
 
         output.add("%s|%s|%d|%g|%g" % (code, place, region, x, y))

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # testclient.py - send random postal codes to the graphical application for testing.
@@ -25,9 +25,7 @@
 #
 
 
-from __future__ import division
-
-import os, os.path
+import os
 import sys
 import socket
 import time
@@ -38,24 +36,25 @@ from getopt import getopt, GetoptError
 
 
 def print_usage():
-    sys.stdout.write("USAGE: %s [-h <hostname>] [-p <port>] [-r <rate>] [-t <tag>] [-v] -f <postalcodes.txt>\n" % os.path.basename(sys.argv[0]))
+    usage_str = "USAGE: %s [-h <hostname>] [-p <port>] [-r <rate>] [-t <tag>] [-v] -f <postalcodes.txt>\n"
+    sys.stdout.write(usage_str % os.path.basename(sys.argv[0]))
 
 
 def parse_args():
     try:
         options, args = getopt(sys.argv[1:], "h:p:r:t:vf:", ["hostname=", "port=", "rate=", "tag=", "verbose", "file="])
-    except GetoptError, e:
+    except GetoptError as e:
         sys.stderr.write("error: %s\n" % e)
         print_usage()
         sys.exit(1)
 
-    hostname = "127.0.0.1" 
+    hostname = "127.0.0.1"
     port = 15001
     rate = 4  # ...per second
     tag = "PID%d" % os.getpid()
     verbose = False
     ifile = None
-        
+
     for option, value in options:
         if option in ("-h", "--hostname"):
             hostname = value
@@ -69,12 +68,12 @@ def parse_args():
             verbose = True
         elif option in ("-f", "--file"):
             ifile = value
-   
-    if not re.match("^\w{1,16}$", tag):
+
+    if not re.match(r"^\w{1,16}$", tag):
         sys.stderr.write("error: malformed tag\n")
         sys.exit(1)
 
-    if ifile == None:
+    if ifile is None:
         sys.stderr.write("error: parameter(s) missing\n")
         print_usage()
         sys.exit(1)
@@ -103,7 +102,7 @@ if __name__ == "__main__":
         # can't be reached. We want it to keep running and recover automatically.
         try:
             message = "%s,%s" % (random.choice(codes), tag)
-            udp.sendto(message, address)
+            udp.sendto(message.encode("ascii"), address)
 
             if verbose:
                 sys.stdout.write(message + "\n")
@@ -111,7 +110,7 @@ if __name__ == "__main__":
         except socket.error:
             pass
 
-        time.sleep(1/rate)
+        time.sleep(1 / rate)
 
 
 # vim: set expandtab ts=4 sw=4:
