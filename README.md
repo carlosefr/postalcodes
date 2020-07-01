@@ -19,7 +19,7 @@ What does it need to run?
   * [Java](https://jdk.java.net/) (either as a separate download or, preferably, the version included with Processing)
   * [Processing](http://processing.org/) Processing 3.5 (for the graphical application)
   * [UDP](http://ubaa.net/shared/processing/udp/) sockets library for Processing
-  * [Python](http://python.org/Python) 3.7.7 or newer (optional, for the example agent and database import script)
+  * [Python](http://python.org/) 3.7.7 or newer (optional, for the example agent and database import script)
 
 Older versions of any of these packages may work, but haven't been tested. Newer versions should also work, and you should use them if possible.
 
