@@ -53,6 +53,7 @@ Map<String,PostalCode> codes;
 PlaceMarkers markers;
 
 PImage artwork;
+PImage screen;
 UDP server;
 PrintWriter logfile;
 SnowFall snow;
@@ -83,25 +84,28 @@ void settings() {
 
 void setup() {
   frameRate(TARGET_FRAMERATE);
-  
+
   // Force v-sync and anti-aliasing when using OpenGL...
   if (glRendererEnabled()) {
     glSetSync(true);
     glSetSmooth(true);
   }
-  
+
   // Hide the cursor when in "present/fullscreen" mode...
   if (frame.isUndecorated()) {
     noCursor();
   }
-  
+
   // Load the postal codes database as screen (pixel) coordinates...
   bounds = calculateRegionBounds(50);
   codes = Collections.unmodifiableMap(loadPostalCodesDB("postalcodes.txt", bounds));
   logfile = createWriter("postalcodes.log");
-  
+
+  // Enable snowfall by default...
+  // snow = new SnowFall(SNOW_DENSITY);
+
   // These two external resources define the overall look of the application...
-  artwork = loadImage(String.format("background-%dx%d.png", width, height));
+  artwork = loadImage(String.format("background-%s%dx%d.png", snow == null ? "": "snow-", width, height));
   colors = loadColorSettings("colors.properties");
 
   // Save the colors to avoid a "get" on each draw...
@@ -122,9 +126,6 @@ void setup() {
 
   markers = new PlaceMarkers();
 
-  // Enable snowfall by default...
-  // snow = new SnowFall(SNOW_DENSITY);
-
   server = new UDP(this, SERVER_PORT);
   server.listen(true);
 
@@ -142,19 +143,21 @@ void setup() {
 
 
 void draw() {
+  tint(255);  // ...ensure opaque images.
+
   // Draw only once a second unless there's something that requires continuous drawing...
   if (frameCount > 2 && frameCount % TARGET_FRAMERATE != 0 && markers.exploding() == 0 && snow == null) {
+    image(screen, 0, 0);  // ...workaround for P2D in present/fullscreen mode.
+
     /*
      * There seems to be an OpenGL issue where sometimes the screen starts flashing on startup.
      * Drawing the first two frames seems to mitigate the problem, but does not eliminate it completely.
      */
     return;
   }
-  
-  // On the Mac image() is *much* faster than background(), but exhibits
-  // some random strange behavior in Processing 3.1. This is unfortunate,
-  // because background() puts retina performance below acceptable levels...
-  background(artwork);
+
+  // On the Mac image() is *much* faster than background()...
+  image(artwork, 0, 0);
 
   // Make sure expired markers aren't drawn...
   markers.clean();
@@ -188,6 +191,8 @@ void draw() {
   if (showInfoBox) {
     drawInfoBox();
   }
+
+  screen = this.get();
 }
 
 
@@ -282,6 +287,7 @@ void keyReleased() {
   // Toggle snowfall...
   if (key == 's') {
     snow = (snow == null ? new SnowFall(SNOW_DENSITY) : null);
+    artwork = loadImage(String.format("background-%s%dx%d.png", snow == null ? "": "snow-", width, height));
   }
   
   if (key == 't') {
