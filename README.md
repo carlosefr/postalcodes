@@ -16,7 +16,7 @@ Besides the graphical application, based on [Processing](http://processing.org/)
 What does it need to run?
 =========================
 
-  * [Java](http://www.oracle.com/technetwork/java/) (either as a separate download or the version included with Processing)
+  * [Java](https://jdk.java.net/) (either as a separate download or, preferably, the version included with Processing)
   * [Processing](http://processing.org/) Processing 3.5 (for the graphical application)
   * [UDP](http://ubaa.net/shared/processing/udp/) sockets library for Processing
   * [Python](http://python.org/Python) 3.7.7 or newer (optional, for the example agent and database import script)
